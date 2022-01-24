@@ -1,14 +1,14 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 use PhpOffice\PhpSpreadsheet\Exception as SpreadSheetException;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as SpreadSheetWriterException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Tbl\SmartExportBundle\Entity\SmartExportEngine;
-use Tbl\SmartExportBundle\Model\ExportSettings;
+use Odb\SmartExportBundle\Entity\SmartExportEngine;
+use Odb\SmartExportBundle\Model\ExportSettings;
 
 interface SmartExportInterface
 {

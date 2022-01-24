@@ -1,8 +1,8 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
-use Tbl\SmartExportBundle\Entity\SmartExportEngine;
+use Odb\SmartExportBundle\Entity\SmartExportEngine;
 
 trait SmartExportFinder
 {

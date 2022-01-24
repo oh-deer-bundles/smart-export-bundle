@@ -1,18 +1,18 @@
 <?php
 
 
-namespace Tbl\SmartExportBundle\DependencyInjection;
+namespace Odb\SmartExportBundle\DependencyInjection;
 
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Tbl\SmartExportBundle\Repository\SmartExportEngineRepository;
-use Tbl\SmartExportBundle\Repository\SmartExportColumnRepository;
+use Odb\SmartExportBundle\Repository\SmartExportEngineRepository;
+use Odb\SmartExportBundle\Repository\SmartExportColumnRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
-class TblSmartExportExtension extends Extension
+class OdbSmartExportExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -23,7 +23,7 @@ class TblSmartExportExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 //
-//        $definition = $container->getDefinition('tbl.cram.temp_file_manager');
+//        $definition = $container->getDefinition('odb.cram.temp_file_manager');
 //        $definition->setArgument(0, $config['temp_directory']);
 
 

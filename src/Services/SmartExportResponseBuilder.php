@@ -1,11 +1,11 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception as SpreadSheetException;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as SpreadSheetWriterException;
-use Tbl\SmartExportBundle\Model\ExportSettings;
+use Odb\SmartExportBundle\Model\ExportSettings;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 

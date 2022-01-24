@@ -1,6 +1,6 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Form;
+namespace Odb\SmartExportBundle\Form;
 
 
 use Symfony\Component\Form\AbstractType;
@@ -11,9 +11,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Tbl\SmartExportBundle\Services\SmartExport;
-use Tbl\SmartExportBundle\Services\SmartExportChoice;
-use Tbl\SmartExportBundle\Services\SmartExportChoiceInterface;
+use Odb\SmartExportBundle\Services\SmartExport;
+use Odb\SmartExportBundle\Services\SmartExportChoice;
+use Odb\SmartExportBundle\Services\SmartExportChoiceInterface;
 
 class SmartExportType extends AbstractType
 {

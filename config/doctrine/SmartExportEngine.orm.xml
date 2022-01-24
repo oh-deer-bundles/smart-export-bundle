@@ -4,9 +4,9 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                                       http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="Tbl\SmartExportBundle\Entity\SmartExportEngine"
+    <entity name="Odb\SmartExportBundle\Entity\SmartExportEngine"
             table="smart_export_engine"
-            repository-class="Tbl\SmartExportBundle\Repository\SmartExportEngineRepository">
+            repository-class="Odb\SmartExportBundle\Repository\SmartExportEngineRepository">
 
 <!--        <unique-constraints>-->
 <!--            <unique-constraint name="code_idx" columns="code" />-->
@@ -27,7 +27,7 @@
         <field name="className" column="class_name" type="string" length="128" />
         <field name="description" column="description" type="string" length="255"  nullable="true"/>
 
-        <one-to-many field="columns" target-entity="Tbl\SmartExportBundle\Entity\SmartExportColumn" mapped-by="engine">
+        <one-to-many field="columns" target-entity="Odb\SmartExportBundle\Entity\SmartExportColumn" mapped-by="engine">
             <cascade>
                 <cascade-persist/>
                 <cascade-remove/>

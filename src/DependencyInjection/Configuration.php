@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tbl\SmartExportBundle\DependencyInjection;
+namespace Odb\SmartExportBundle\DependencyInjection;
 
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;

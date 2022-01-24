@@ -1,8 +1,8 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Model;
+namespace Odb\SmartExportBundle\Model;
 
-use Tbl\SmartExportBundle\Entity\SmartExportEngine;
+use Odb\SmartExportBundle\Entity\SmartExportEngine;
 
 class ExportSettings
 {
@@ -69,7 +69,7 @@ class ExportSettings
     private $isValid = false;
 
     /**
-     * @var \Tbl\SmartExportBundle\Model\ExcelStyle|null
+     * @var \Odb\SmartExportBundle\Model\ExcelStyle|null
      */
     private $excelStyle;
     

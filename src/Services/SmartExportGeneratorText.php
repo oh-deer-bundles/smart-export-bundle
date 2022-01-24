@@ -1,12 +1,12 @@
 <?php
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 
 use Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\String\Exception\RuntimeException;
-use Tbl\SmartExportBundle\Model\ExportSettings;
+use Odb\SmartExportBundle\Model\ExportSettings;
 
 class SmartExportGeneratorText
 {

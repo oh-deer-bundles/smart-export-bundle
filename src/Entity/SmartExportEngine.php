@@ -1,6 +1,6 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Entity;
+namespace Odb\SmartExportBundle\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;

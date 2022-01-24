@@ -5,80 +5,80 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
         <parameters>
 <!--            Main Public Class -->
-            <parameter key="tbl.smart-export.export.class">Tbl\SmartExportBundle\Services\SmartExport</parameter>
+            <parameter key="odb.smart-export.export.class">Odb\SmartExportBundle\Services\SmartExport</parameter>
 <!--            Admin Public Class -->
-            <parameter key="tbl.smart-export.admin.class">Tbl\SmartExportBundle\Services\SmartExportAdmin</parameter>
+            <parameter key="odb.smart-export.admin.class">Odb\SmartExportBundle\Services\SmartExportAdmin</parameter>
 <!--            Repository -->
-            <parameter key="tbl.smart-export.column.repository.class">Tbl\SmartExportBundle\Repository\SmartExportColumnRepository</parameter>
-            <parameter key="tbl.smart-export.engine.repository.class">Tbl\SmartExportBundle\Repository\SmartExportEngineRepository</parameter>
+            <parameter key="odb.smart-export.column.repository.class">Odb\SmartExportBundle\Repository\SmartExportColumnRepository</parameter>
+            <parameter key="odb.smart-export.engine.repository.class">Odb\SmartExportBundle\Repository\SmartExportEngineRepository</parameter>
 <!--            Choice Builder -->
 <!--            Query Builder -->
-            <parameter key="tbl.smart-export.choice.class">Tbl\SmartExportBundle\Services\SmartExportChoice</parameter>
-            <parameter key="tbl.smart-export.query.class">Tbl\SmartExportBundle\Services\SmartExportQuery</parameter>
+            <parameter key="odb.smart-export.choice.class">Odb\SmartExportBundle\Services\SmartExportChoice</parameter>
+            <parameter key="odb.smart-export.query.class">Odb\SmartExportBundle\Services\SmartExportQuery</parameter>
 <!--            FormType -->
-            <parameter key="tbl.smart-export.form.class">Tbl\SmartExportBundle\Form\SmartExportType</parameter>
-            <parameter key="tbl.smart-export.admin.form.add.engine.class">Tbl\SmartExportBundle\Form\Admin\SmartExportEngineType</parameter>
-            <parameter key="tbl.smart-export.admin.form.edit.engine.class">Tbl\SmartExportBundle\Form\Admin\EditSmartExportEngineType</parameter>
-            <parameter key="tbl.smart-export.admin.form.column.class">Tbl\SmartExportBundle\Form\Admin\SmartExportColumnType</parameter>
+            <parameter key="odb.smart-export.form.class">Odb\SmartExportBundle\Form\SmartExportType</parameter>
+            <parameter key="odb.smart-export.admin.form.add.engine.class">Odb\SmartExportBundle\Form\Admin\SmartExportEngineType</parameter>
+            <parameter key="odb.smart-export.admin.form.edit.engine.class">Odb\SmartExportBundle\Form\Admin\EditSmartExportEngineType</parameter>
+            <parameter key="odb.smart-export.admin.form.column.class">Odb\SmartExportBundle\Form\Admin\SmartExportColumnType</parameter>
             <!-- TEST -->
-            <parameter key="tbl.smart-export.test.class">Tbl\SmartExportBundle\Services\Test</parameter>
+            <parameter key="odb.smart-export.test.class">Odb\SmartExportBundle\Services\Test</parameter>
         </parameters>
         <services>
             <defaults autowire="true" autoconfigure="true" public="false" />
 <!--            Main public class -->
-            <service id="tbl.smart-export.export" class="%tbl.smart-export.export.class%" public="true">
-                <argument type="service" id="tbl.smart-export.choice" />
-                <argument type="service" id="tbl.smart-export.query" />
-                <argument type="service" id="tbl.smart-export.engine.repository" />
+            <service id="odb.smart-export.export" class="%odb.smart-export.export.class%" public="true">
+                <argument type="service" id="odb.smart-export.choice" />
+                <argument type="service" id="odb.smart-export.query" />
+                <argument type="service" id="odb.smart-export.engine.repository" />
                 <argument type="service" id="request_stack" />
                 <argument type="service" id="form.factory" />
                 <argument type="service" id="slugger" />
 
             </service>
-            <service id="Tbl\SmartExportBundle\Services\SmartExportInterface" alias="tbl.smart-export.export" public="true"/>
+            <service id="Odb\SmartExportBundle\Services\SmartExportInterface" alias="odb.smart-export.export" public="true"/>
 <!--            Admin public class -->
-            <service id="tbl.smart-export.admin" class="%tbl.smart-export.admin.class%" public="true">
+            <service id="odb.smart-export.admin" class="%odb.smart-export.admin.class%" public="true">
                 <argument type="service" id="request_stack" />
                 <argument type="service" id="form.factory" />
-                <argument type="service" id="tbl.smart-export.engine.repository" />
-                <argument type="service" id="tbl.smart-export.column.repository" />
+                <argument type="service" id="odb.smart-export.engine.repository" />
+                <argument type="service" id="odb.smart-export.column.repository" />
             </service>
-            <service id="Tbl\SmartExportBundle\Services\SmartExportAdminInterface" alias="tbl.smart-export.admin" public="true"/>
+            <service id="Odb\SmartExportBundle\Services\SmartExportAdminInterface" alias="odb.smart-export.admin" public="true"/>
 <!--            Repository -->
-            <service id="tbl.smart-export.engine.repository" class="%tbl.smart-export.engine.repository.class%" public="false">
+            <service id="odb.smart-export.engine.repository" class="%odb.smart-export.engine.repository.class%" public="false">
                 <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
                 <tag name="doctrine.repository_service"/>
             </service>
-            <service id="tbl.smart-export.column.repository" class="%tbl.smart-export.column.repository.class%" public="false">
+            <service id="odb.smart-export.column.repository" class="%odb.smart-export.column.repository.class%" public="false">
                 <argument type="service" id="Doctrine\Persistence\ManagerRegistry" />
                 <tag name="doctrine.repository_service"/>
             </service>
 <!--            Choice Builder -->
 <!--            Query Builder -->
-            <service id="tbl.smart-export.choice" class="%tbl.smart-export.choice.class%" public="true">
-                <argument type="service" id="tbl.smart-export.engine.repository" />
-                <argument type="service" id="tbl.smart-export.column.repository" />
+            <service id="odb.smart-export.choice" class="%odb.smart-export.choice.class%" public="true">
+                <argument type="service" id="odb.smart-export.engine.repository" />
+                <argument type="service" id="odb.smart-export.column.repository" />
             </service>
-            <service id="Tbl\SmartExportBundle\Services\SmartExportChoiceInterface" alias="tbl.smart-export.choice" />
+            <service id="Odb\SmartExportBundle\Services\SmartExportChoiceInterface" alias="odb.smart-export.choice" />
 
-            <service id="tbl.smart-export.query" class="%tbl.smart-export.query.class%" public="true">
+            <service id="odb.smart-export.query" class="%odb.smart-export.query.class%" public="true">
                 <argument type="service" id="doctrine.orm.entity_manager" />
             </service>
-            <service id="Tbl\SmartExportBundle\Services\SmartExportQueryInterface" alias="tbl.smart-export.query" />
+            <service id="Odb\SmartExportBundle\Services\SmartExportQueryInterface" alias="odb.smart-export.query" />
 <!--            FormType -->
-            <service id="tbl.smart-export.form" class="%tbl.smart-export.form.class%" public="true">
-                <argument type="service" id="tbl.smart-export.choice" />
+            <service id="odb.smart-export.form" class="%odb.smart-export.form.class%" public="true">
+                <argument type="service" id="odb.smart-export.choice" />
                 <tag name="form.type" />
             </service>
-            <service id="tbl.smart-export.admin.form.add.engine" class="%tbl.smart-export.admin.form.add.engine.class%" public="true">
-                <argument type="service" id="tbl.smart-export.query" />
+            <service id="odb.smart-export.admin.form.add.engine" class="%odb.smart-export.admin.form.add.engine.class%" public="true">
+                <argument type="service" id="odb.smart-export.query" />
                 <tag name="form.type" />
             </service>
-            <service id="tbl.smart-export.admin.form.edit.engine" class="%tbl.smart-export.admin.form.edit.engine.class%" public="true">
-                <argument type="service" id="tbl.smart-export.query" />
+            <service id="odb.smart-export.admin.form.edit.engine" class="%odb.smart-export.admin.form.edit.engine.class%" public="true">
+                <argument type="service" id="odb.smart-export.query" />
                 <tag name="form.type" />
             </service>
-            <service id="tbl.smart-export.admin.form.column" class="%tbl.smart-export.admin.form.column.class%" public="true">
+            <service id="odb.smart-export.admin.form.column" class="%odb.smart-export.admin.form.column.class%" public="true">
                 <tag name="form.type" />
             </service>
 

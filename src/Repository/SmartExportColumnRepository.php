@@ -1,8 +1,8 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Repository;
+namespace Odb\SmartExportBundle\Repository;
 
-use Tbl\SmartExportBundle\Entity\SmartExportColumn;
+use Odb\SmartExportBundle\Entity\SmartExportColumn;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

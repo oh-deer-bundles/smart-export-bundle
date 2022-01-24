@@ -1,6 +1,6 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Model;
+namespace Odb\SmartExportBundle\Model;
 
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;

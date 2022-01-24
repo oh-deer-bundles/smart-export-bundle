@@ -23,12 +23,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Tbl\\SmartExportBundle\\": "src/"
+            "Odb\\SmartExportBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tbl\\SmartExportBundle\\Tests\\": "tests/"
+            "Odb\\SmartExportBundle\\Tests\\": "tests/"
         }
     },
     "license": "MIT",

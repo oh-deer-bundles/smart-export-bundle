@@ -5,13 +5,13 @@
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
 <!--    <route id="tbl_cram_admin_index" path="/"-->
-<!--           controller="tbl.cram.admin.controller:index"/>-->
+<!--           controller="odb.cram.admin.controller:index"/>-->
 
 <!--    <route id="tbl_cram_admin_engine_edit" path="/edit/{engine_id}"-->
-<!--           controller="tbl.cram.admin.controller:edit"/>-->
+<!--           controller="odb.cram.admin.controller:edit"/>-->
 
 <!--    <route id="tbl_cram_admin_engine_delete" path="/delete/{engine_id}"-->
-<!--           controller="tbl.cram.admin.controller:delete"/>-->
+<!--           controller="odb.cram.admin.controller:delete"/>-->
 
 
 </routes>

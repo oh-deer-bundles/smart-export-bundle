@@ -1,13 +1,13 @@
 <?php
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 
 use Laminas\Code\Exception\InvalidArgumentException;
 use RuntimeException;
-use Tbl\SmartExportBundle\Entity\SmartExportColumn;
-use Tbl\SmartExportBundle\Entity\SmartExportEngine;
-use Tbl\SmartExportBundle\Model\ExportSettings;
+use Odb\SmartExportBundle\Entity\SmartExportColumn;
+use Odb\SmartExportBundle\Entity\SmartExportEngine;
+use Odb\SmartExportBundle\Model\ExportSettings;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;

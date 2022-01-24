@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
-use Tbl\SmartExportBundle\Model\ExportSettings;
+use Odb\SmartExportBundle\Model\ExportSettings;
 
 interface SmartExportQueryInterface
 {

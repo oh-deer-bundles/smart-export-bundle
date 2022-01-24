@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 use DateTime;
 use DatetimeInterface;

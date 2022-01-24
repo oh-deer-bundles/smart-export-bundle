@@ -4,9 +4,9 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                                       http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="Tbl\SmartExportBundle\Entity\SmartExportColumn"
+    <entity name="Odb\SmartExportBundle\Entity\SmartExportColumn"
             table="smart_export_column"
-            repository-class="Tbl\SmartExportBundle\Repository\SmartExportColumnRepository">
+            repository-class="Odb\SmartExportBundle\Repository\SmartExportColumnRepository">
 
         <lifecycle-callbacks>
             <lifecycle-callback type="prePersist" method="updateDate" />
@@ -29,7 +29,7 @@
         <field name="cellGroupIndex" column="cell_group_index" type="string" length="32" nullable="true"/>
 <!--        <field name="cellGroupFilter" column="cell_group_filter" type="string" length="32" nullable="true"/>-->
 
-        <many-to-one field="engine" target-entity="Tbl\SmartExportBundle\Entity\SmartExportEngine" inversed-by="columns">
+        <many-to-one field="engine" target-entity="Odb\SmartExportBundle\Entity\SmartExportEngine" inversed-by="columns">
         </many-to-one>
 
     </entity>

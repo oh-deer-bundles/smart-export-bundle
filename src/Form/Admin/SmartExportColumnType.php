@@ -1,5 +1,5 @@
 <?php
-namespace Tbl\SmartExportBundle\Form\Admin;
+namespace Odb\SmartExportBundle\Form\Admin;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -7,8 +7,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Tbl\SmartExportBundle\Entity\SmartExportColumn;
-use Tbl\SmartExportBundle\Services\SmartExportQueryInterface;
+use Odb\SmartExportBundle\Entity\SmartExportColumn;
+use Odb\SmartExportBundle\Services\SmartExportQueryInterface;
 
 class SmartExportColumnType extends AbstractType
 {

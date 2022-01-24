@@ -1,12 +1,12 @@
 <?php
 
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 
-use Tbl\SmartExportBundle\Entity\SmartExportColumn;
-use Tbl\SmartExportBundle\Repository\SmartExportColumnRepository;
-use Tbl\SmartExportBundle\Repository\SmartExportEngineRepository;
+use Odb\SmartExportBundle\Entity\SmartExportColumn;
+use Odb\SmartExportBundle\Repository\SmartExportColumnRepository;
+use Odb\SmartExportBundle\Repository\SmartExportEngineRepository;
 
 class SmartExportChoice implements SmartExportChoiceInterface
 {

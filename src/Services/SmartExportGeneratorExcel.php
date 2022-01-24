@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Tbl\SmartExportBundle\Services;
+namespace Odb\SmartExportBundle\Services;
 
 
 use PhpOffice\PhpSpreadsheet\Exception as SpreadSheetException;
@@ -10,8 +10,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as SpreadSheetWriterException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Tbl\SmartExportBundle\Model\ExportSettings;
-use Tbl\SmartExportBundle\Model\ExcelStyle;
+use Odb\SmartExportBundle\Model\ExportSettings;
+use Odb\SmartExportBundle\Model\ExcelStyle;
 
 class SmartExportGeneratorExcel
 {
