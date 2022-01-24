@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>seb.file_format.label</source>
+                <target>File format</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>seb.file_format.csv</source>
+                <target>CSV file</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>seb.file_format.txt</source>
+                <target>Text file</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>seb.file_format.excel</source>
+                <target>MS Excel (xlsx)</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>seb.separator.label</source>
+                <target>Separator</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>seb.separator.semicolon</source>
+                <target>Semicolon (;)</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>seb.separator.comma</source>
+                <target>Comma (,)</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>seb.separator.tabulation</source>
+                <target>Tabulation</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>seb.separator.pipe</source>
+                <target>Pipe (|)</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>seb.charset.label</source>
+                <target>Encoding characters</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>seb.charset.windows</source>
+                <target>MS Windows</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>seb.charset.mac</source>
+                <target>Macintosh</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>seb.charset.utf8</source>
+                <target>UTF-8</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>seb.is_active</source>
+                <target>Enabled</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>seb.class_name.label</source>
+                <target>Related to</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>seb.class_name.placeholder</source>
+                <target>Choose on entity</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>seb.code.label</source>
+                <target>Code</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>seb.code.helper</source>
+                <target>This code must be unique.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>seb.description.label</source>
+                <target>Description</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>seb.description.helper</source>
+                <target>File a short description to this export</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>seb.choice_label.label</source>
+                <target>Form label</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>seb.choice_label.helper</source>
+                <target>Shown in export form</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>seb.header_label.label</source>
+                <target>Column label</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>seb.header_label.helper</source>
+                <target>Shown in file header</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>seb.column_group_index.label</source>
+                <target>Group of columns label</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>seb.column_group_index.helper</source>
+                <target>Works only for Excel export</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>seb.cell_group_index.label</source>
+                <target>Code of cells group</target>
+            </trans-unit>
+            <trans-unit id="28">
+                <source>seb.cell_group_index.helper</source>
+                <target>Allows to concat many fields in one cell</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>seb.interpreter.label</source>
+                <target>Interpreter</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>seb.interpreter.helper</source>
+                <target>Translate the field data</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>seb.class_property.label</source>
+                <target>Property</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>seb.class_property.helper</source>
+                <target>File like as define in the entity, eg. in case of relation write it like twig: addresses.city</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

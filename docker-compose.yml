@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  db:
+    image: mariadb:10.4.19
+    container_name: smart_export_db
+    restart: 'no'
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./.backups:/opt/backups
+    networks:
+      - dev
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: smart_export_dba
+    restart: 'no'
+    depends_on:
+      - db
+    ports:
+      - 81:80
+    environment:
+      PMA_HOST: db
+    networks:
+      - dev
+
+#  maildev:
+#    image: maildev/maildev
+#    container_name: cfoot_mail
+#    command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+#    ports:
+#      - "8025:80"
+#    restart: 'no'
+#    networks:
+#      - dev
+
+  www:
+    image: phpsymfony5:v0.2
+    container_name: smart_export
+    depends_on:
+      - db
+    ports:
+      - "8008:8000"
+    volumes:
+      - ./:/var/www/html
+      - ./../bundles:/var/www/bundles
+      - ./../_tools:/var/www/tools
+      - ./../../.ssh:/root/.tmp_ssh
+#      - ./.tmp:/tmp
+    restart: 'no'
+    networks:
+      - dev
+
+networks:
+  dev:
+
+volumes:
+  db-data:

@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>seb.file_format.label</source>
+                <target>Type de fichier</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>seb.file_format.csv</source>
+                <target>Fichier csv</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>seb.file_format.txt</source>
+                <target>Fichier texte</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>seb.file_format.excel</source>
+                <target>MS Excel (xlsx)</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>seb.separator.label</source>
+                <target>Séparateur</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>seb.separator.semicolon</source>
+                <target>Point-virgule (;)</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>seb.separator.comma</source>
+                <target>Virgule (,)</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>seb.separator.tabulation</source>
+                <target>Tabulation</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>seb.separator.pipe</source>
+                <target>Barre verticale (|)</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>seb.charset.label</source>
+                <target>Encodage caractères</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>seb.charset.windows</source>
+                <target>MS Windows</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>seb.charset.mac</source>
+                <target>Macintosh</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>seb.charset.utf8</source>
+                <target>UTF-8</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>seb.is_active</source>
+                <target>Actif</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>seb.class_name.label</source>
+                <target>Relatif à</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>seb.class_name.placeholder</source>
+                <target>Choisissez une entité</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>seb.code.label</source>
+                <target>Code</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>seb.code.helper</source>
+                <target>Ce code doit être unique.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>seb.description.label</source>
+                <target>Description</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>seb.description.helper</source>
+                <target>Saisissez une courte description à votre export</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>seb.choice_label.label</source>
+                <target>Libellé du formulaire</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>seb.choice_label.helper</source>
+                <target>Apparait dans le formulaire d'export</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>seb.header_label.label</source>
+                <target>Libellé de la colonne</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>seb.header_label.helper</source>
+                <target>Apparait dans l'entête du fichier</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>seb.column_group_index.label</source>
+                <target>Libellé du groupe de colonnes</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>seb.column_group_index.helper</source>
+                <target>Uniquement pour Excel</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>seb.cell_group_index.label</source>
+                <target>Code du groupe de cellule</target>
+            </trans-unit>
+            <trans-unit id="28">
+                <source>seb.cell_group_index.helper</source>
+                <target>Permet de rassembler plusieurs champs dans une cellule</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>seb.interpreter.label</source>
+                <target>Interprète</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>seb.interpreter.helper</source>
+                <target>Transforme le champ</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>seb.class_property.label</source>
+                <target>Propriété de la classe</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>seb.class_property.helper</source>
+                <target>Tel que défini dans votre entité pour les relations enchainer les propriétés avec un point ex addresses.city</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
