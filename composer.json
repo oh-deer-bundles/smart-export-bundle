@@ -1,5 +1,5 @@
 {
-    "name": "fabgg/smart-export-bundle",
+    "name": "oh-deer-bundles/smart-export-bundle",
     "description": "Symfony Bundle helps for export data to file",
     "type": "symfony-bundle",
     "require": {
@@ -34,8 +34,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Fabrice GARES",
-            "email": "fabrice.gares@timberlee.fr"
+            "name": "Fabrice GARES"
         }
     ]
 }
