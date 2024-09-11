@@ -25,6 +25,7 @@
         </parameters>
         <services>
             <defaults autowire="true" autoconfigure="true" public="false" />
+
 <!--            Main public class -->
             <service id="odb.smart-export.export" class="%odb.smart-export.export.class%" public="true">
                 <argument type="service" id="odb.smart-export.choice" />
@@ -80,6 +81,11 @@
             </service>
             <service id="odb.smart-export.admin.form.column" class="%odb.smart-export.admin.form.column.class%" public="true">
                 <tag name="form.type" />
+            </service>
+
+            <service id="odb.smart-export.controller.admin" class="Odb\SmartExportBundle\Controller\AdminController" public="false">
+                <argument type="service" id="odb.smart-export.admin" />
+                <argument type="service" id="odb.smart-export.export" />
             </service>
 
         </services>

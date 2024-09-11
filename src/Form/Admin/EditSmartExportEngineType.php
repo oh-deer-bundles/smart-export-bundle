@@ -15,8 +15,8 @@ class EditSmartExportEngineType extends SmartExportEngineType
     {
         parent::buildForm($builder, $options);
         $builder
-            ->add('isActive', CheckboxType::class,[
-                'label' => 'seb.is_active',
+            ->add('enabled', CheckboxType::class,[
+                'label' => 'seb.enabled',
                 'required' => false
             ])
             ->remove('className')

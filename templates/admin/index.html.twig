@@ -1,0 +1,95 @@
+{% extends '@OdbSmartExport/_layout.html.twig' %}
+{% form_theme formAddEngine 'bootstrap_5_layout.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">Index admin bundle</h1>
+        </div>
+        <div class="col-12">
+            <!-- Button trigger modal -->
+            <a href="{{ url('odb_smart_export_admin_data_structure',{'token':csrf_token('odb_smart_export_admin_data_structure')}) }}" class="btn btn-success me-3" >Download data structure</a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addExport">New Export</button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="addExport" tabindex="-1" aria-labelledby="addExportTitle" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        {{ form_start(formAddEngine) }}
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="addExportTitle">Add an export</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {{ form_row(formAddEngine.code) }}
+                            {{ form_row(formAddEngine.description) }}
+                            {{ form_row(formAddEngine.className) }}
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Save</button>
+                        </div>
+                        {{ form_end(formAddEngine) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            {% if engines|length > 0 %}
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Related entity</th>
+                    <th scope="col">Enabled</th>
+                    <th scope="col">Created At</th>
+                    <th scope="col">Updated At</th>
+                    <th class="text-end" scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+            {% for engine in engines %}
+                    <tr>
+                        <th scope="row">{{ engine.id }}</th>
+                        <td>{{ engine.code }}</td>
+                        <td>{{ engine.description }}</td>
+                        <td>{{ engine.className }}</td>
+                        <td>{{ engine.isActive ? 'Y' : 'N' }}</td>
+                        <td>{{ engine.createdAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
+                        <td>{{ engine.updatedAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
+                        <td class="text-end">
+{#                            <button type="button" data-bs-toggle="modal" data-bs-target="#confirmDelete" class="btn btn-danger me-3 btn-sm" data-url="{{ url('odb_smart_export_admin_remove', {'code':engine.code }) }}">Remove</button>#}
+                            <a href="{{ url('odb_smart_export_admin_demo_export', {'code':engine.code }) }}" class="btn btn-success me-3 btn-sm">Demo export</a>
+                            <a href="{{ url('odb_smart_export_admin_toggle', {'code':engine.code }) }}" class="btn btn-danger me-3 btn-sm">{{ engine.isActive ? 'Disable':'Enable' }}</a>
+                            <a href="{{ url('odb_smart_export_admin_edit', {'code':engine.code }) }}" class="btn btn-warning btn-sm">Edit</a>
+                        </td>
+                    </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+                <div class="modal fade" id="confirmDelete" tabindex="-1" aria-labelledby="confirmDeleteTitle" aria-hidden="true">
+                    <div class="modal-dialog text-danger">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="confirmDeleteTitle">Remove export</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-danger">
+                                <div class="fs-3 mb-2">Attention !</div>
+                                <div>Are you sure to permanently remove an export ?</div>
+                            </div>
+                            <div class="modal-footer">
+                                <a href="#" class="btn btn-danger">Confirm delete</a>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+            <div class="text-center lead">You must set an export</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

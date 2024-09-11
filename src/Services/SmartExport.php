@@ -41,7 +41,7 @@ class SmartExport implements SmartExportInterface
 
     private ?Request $request;
     private string $locale;
-    private ?FormInterface $form;
+    private ?FormInterface $form = null;
     private ?array $rawData;
     private ?string $code;
 
@@ -138,7 +138,7 @@ class SmartExport implements SmartExportInterface
     private function setRawData(): void
     {
         $this->rawData = $this->smartExportQuery->getDataFromExportSettings($this->exportSettings);
-        $this->exportSettings->setIsValid($this->rawData ?: false);
+        $this->exportSettings->setIsValid((bool)$this->rawData);
     }
 
 

@@ -9,18 +9,18 @@
         "ext-json": "*",
         "ext-iconv": "*",
         "ext-zip": "*",
-        "phpoffice/phpspreadsheet": "^1.18",
-        "symfony/config": "^5.4",
-        "symfony/dependency-injection": "^5.4",
-        "symfony/form": "^5.4",
-        "symfony/http-foundation": "^5.4",
-        "symfony/orm-pack": "^2.1",
-        "symfony/string": "^5.4",
-        "symfony/validator": "^5.4"
+        "phpoffice/phpspreadsheet": "^1.21.0",
+        "symfony/config": "^6.4",
+        "symfony/dependency-injection": "^6.4",
+        "symfony/form": "^6.4",
+        "symfony/http-foundation": "^6.4",
+        "symfony/orm-pack": "^2.4",
+        "symfony/string": "^6.4",
+        "symfony/validator": "^6.4"
     },
     "require-dev": {
-        "symfony/phpunit-bridge": "^5.4",
-        "symfony/browser-kit": "^5.4"
+        "symfony/phpunit-bridge": "^6.4",
+        "symfony/browser-kit": "^6.4"
     },
     "autoload": {
         "psr-4": {

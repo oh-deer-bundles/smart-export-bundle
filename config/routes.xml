@@ -4,14 +4,16 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         https://symfony.com/schema/routing/routing-1.0.xsd">
 
-<!--    <route id="tbl_cram_admin_index" path="/"-->
-<!--           controller="odb.cram.admin.controller:index"/>-->
-
-<!--    <route id="tbl_cram_admin_engine_edit" path="/edit/{engine_id}"-->
-<!--           controller="odb.cram.admin.controller:edit"/>-->
-
-<!--    <route id="tbl_cram_admin_engine_delete" path="/delete/{engine_id}"-->
-<!--           controller="odb.cram.admin.controller:delete"/>-->
-
-
+    <route id="odb_smart_export_admin_index" path="/admin/"
+           controller="odb.smart-export.controller.admin::index"/>
+    <route id="odb_smart_export_admin_edit" path="/admin/edit/{code}"
+           controller="odb.smart-export.controller.admin::edit"/>
+    <route id="odb_smart_export_admin_toggle" path="/admin/toggle/{code}"
+           controller="odb.smart-export.controller.admin::toggle"/>
+    <route id="odb_smart_export_admin_remove" path="/admin/remove/{code}"
+           controller="odb.smart-export.controller.admin::toggle"/>
+    <route id="odb_smart_export_admin_data_structure" path="/admin/data-structure/{token}"
+           controller="odb.smart-export.controller.admin::getDataStructure"/>
+    <route id="odb_smart_export_admin_demo_export" path="/admin/demo-export/{code}"
+           controller="odb.smart-export.controller.admin::demoExport"/>
 </routes>

@@ -25,7 +25,7 @@ class SmartExportColumn
     /**
      * @var bool
      */
-    private $isActive = 1;
+    private $enabled = 1;
 
     /**
      * @var int
@@ -117,14 +117,14 @@ class SmartExportColumn
         return $this;
     }
 
-    public function getIsActive(): ?bool
+    public function isEnabled(): ?bool
     {
-        return $this->isActive;
+        return $this->enabled;
     }
 
-    public function setIsActive(bool $isActive): self
+    public function setEnabled(bool $enabled): self
     {
-        $this->isActive = $isActive;
+        $this->enabled = $enabled;
 
         return $this;
     }

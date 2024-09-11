@@ -42,7 +42,7 @@ class SmartExportAdmin implements SmartExportAdminInterface
     public function toggleEngine(string $code):void
     {
         $engine = $this->findByCode($code);
-        $engine->setIsActive(!$engine->getIsActive());
+        $engine->setEnabled(!$engine->isEnabled());
         $this->smartExportEngineRepository->save($engine);
     }
 
@@ -56,7 +56,7 @@ class SmartExportAdmin implements SmartExportAdminInterface
         $formEngine = $this->formFactory->createNamed('form_smart_export_engine_add', SmartExportEngineType::class, $newEngine);
         $formEngine->handleRequest($this->request);
         if($formEngine->isSubmitted() && $formEngine->isValid()) {
-            $newEngine->setIsActive(true);
+            $newEngine->setEnabled(true);
             $this->smartExportEngineRepository->save($newEngine);
             $url = str_replace('code', $newEngine->getCode(), $redirectUrl);
             return new RedirectResponse($url);

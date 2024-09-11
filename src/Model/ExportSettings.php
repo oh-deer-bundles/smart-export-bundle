@@ -13,25 +13,25 @@ class ExportSettings
 
     private string $code;
 
-    private ?string $formattedCode;
+    private ?string $formattedCode = null;
 
     private string $fileFormat;
 
-    private ?string $fileExtension;
+    private ?string $fileExtension = null;
 
-    private ?string $fileMime;
+    private ?string $fileMime = null;
 
     private string $charset;
 
     private string $separator;
 
-    private ?string $locale;
+    private ?string $locale = null;
 
-    private ?string $filename;
+    private ?string $filename = null;
 
     private bool $isValid = false;
 
-    private ?ExcelStyle $excelStyle;
+    private ?ExcelStyle $excelStyle = null;
 
     public function getEngine(): SmartExportEngine
     {

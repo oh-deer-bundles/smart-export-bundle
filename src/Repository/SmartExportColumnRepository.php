@@ -30,7 +30,7 @@ class SmartExportColumnRepository extends ServiceEntityRepository
                 'sec.cellGroupIndex as cellGroup'
             )
             ->where('see.code = :engineCode')
-            ->andWhere('sec.isActive = 1')
+            ->andWhere('sec.enabled = 1')
             ->setParameter('engineCode', $engineCode)
             ->orderBy('sec.choicePosition', 'ASC')
             ->addOrderBy('sec.choiceLabel','ASC');
@@ -43,7 +43,7 @@ class SmartExportColumnRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('sec')
             ->leftJoin('sec.engine', 'see')
             ->where('see.code = :engineCode')
-            ->andWhere('sec.isActive = 1')
+            ->andWhere('sec.enabled = 1')
             ->setParameter('engineCode', $engineCode)
             ->orderBy('sec.choicePosition', 'ASC')
             ->addOrderBy('sec.choiceLabel','ASC');

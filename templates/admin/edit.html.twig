@@ -1,0 +1,148 @@
+{% extends '@OdbSmartExport/_layout.html.twig' %}
+{% form_theme formEditEngine 'bootstrap_5_layout.html.twig' %}
+{% import _self as formMacros %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-12 mb-3">
+            <h1 class="text-center">Edit export</h1>
+        </div>
+        <div class="col-12" {{ stimulus_controller('smart-export-edit') }}>
+            {{ form_start(formEditEngine, {'attr':{'data-smart-export-edit-target':'form'}}) }}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title d-inline-block">Engine</h5>
+                    <div class="d-inline-block ms-3">
+                        {{ form_row(formEditEngine.isActive) }}
+                    </div>
+
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            {{ form_row(formEditEngine.code) }}
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            {{ form_row(formEditEngine.description) }}
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            {{ form_row(formEditEngine.className) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="card-title">Colonnes</h5>
+                </div>
+                <div class="card-body"
+                        {{ stimulus_controller('form-collection',
+                            { prototype: formMacros.render_form_smart_export_column(formEditEngine.columns.vars.prototype, true)|json_encode}
+                        ) }}
+                >
+                    <table class="table table-condensed table-striped input-small-padding vertical-center">
+                        <thead>
+                        <tr>
+                            <th class="shrink text-start"></th>
+                            <th class="shrink" style="min-width: 200px;">Property</th>
+                            <th>Label</th>
+                            <th>Export label</th>
+                            {#                            <th>Groupe Col</th>#}
+                            <th>Group Cell</th>
+                            <th>Interpreter</th>
+                            <th class="shrink text-end"></th>
+                        </tr>
+                        </thead>
+                        <tbody {{ stimulus_target('form-collection', 'fields')}} data-smart-export-edit-target="items">
+                        {% do formEditEngine.columns.setRendered %}
+                        {% for formColumn in formEditEngine.columns %}
+                            {{ formMacros.render_form_smart_export_column(formColumn) }}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="row justify-content-end">
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-primary" {{ stimulus_action('form-collection','addItem') }} {{ stimulus_target('form-collection', 'addButton') }}>Add column</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="text-end">
+                <button type="button" class="btn btn-danger me-3" data-bs-toggle="modal" data-bs-target="#modalDeleteEngine" >
+                    <i class="bi bi-trash me-2"></i>Delete export
+                </button>
+                <a href="{{ url('odb_smart_export_admin_index')}}" class="btn btn-secondary me-3">Cancel</a>
+                <button type="submit" class="btn btn-warning">Save</button>
+            </div>
+            {{ form_end(formEditEngine) }}
+        </div>
+        {#  modal delete contact #}
+        <div id="modalDeleteEngine" data-table-jump-target="modalDelete" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="Suppression de l'export" aria-hidden="true">
+            <div class="modal-dialog modal-danger">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete export {{ code }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="display-5 text-center">Attention !</div>
+                        <div>Vous êtes sur le point de supprimer l'export <b>{{ code }}</b>.<br>
+                            Cette action est irréversible, toutes données seront perdues !
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                        <a href="{{ url('odb_smart_export_admin_remove',{'code':code}) }}" class="btn btn-danger btn-sm" data-action="table-jump#confirmDelete">
+                            <i class="bi bi-trash me-2"></i>Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% macro render_form_smart_export_column(formColumn, whitHelper = false) %}
+    <tr class="item" {{ stimulus_target('form-collection','field') }}>
+        <td>
+            <div class="fs-8 move-up" {{ stimulus_action('click->form-collection','rowUp') }}>⬆</div>
+            <div class="fs-8 move-down" {{ stimulus_action('click->form-collection','rowDown') }}>⬇</div>
+            {{ form_widget(formColumn.choicePosition) }}
+        </td>
+        <td>
+            {{ form_widget(formColumn.classProperty) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.classProperty) }}
+            {% endif %}
+        </td>
+        <td>
+            {{ form_widget(formColumn.choiceLabel) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.choiceLabel) }}
+            {% endif %}
+        </td>
+        <td>
+            {{ form_widget(formColumn.headerLabel) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.headerLabel) }}
+            {% endif %}
+        </td>
+        <td>
+            {{ form_widget(formColumn.cellGroupIndex) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.cellGroupIndex) }}
+            {% endif %}
+        </td>
+        <td>
+            {{ form_widget(formColumn.interpreter) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.interpreter) }}
+            {% endif %}
+        </td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" {{ stimulus_action('form-collection','removeItem') }}>🗑️</button>
+        </td>
+    </tr>
+{% endmacro %}

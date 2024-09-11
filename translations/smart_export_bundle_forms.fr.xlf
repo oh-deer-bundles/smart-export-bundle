@@ -55,7 +55,7 @@
                 <target>UTF-8</target>
             </trans-unit>
             <trans-unit id="14">
-                <source>seb.is_active</source>
+                <source>seb.enabled</source>
                 <target>Actif</target>
             </trans-unit>
             <trans-unit id="15">

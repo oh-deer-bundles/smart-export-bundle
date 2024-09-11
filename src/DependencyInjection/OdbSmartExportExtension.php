@@ -25,9 +25,6 @@ class OdbSmartExportExtension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
-//
-//        $definition = $container->getDefinition('odb.cram.temp_file_manager');
-//        $definition->setArgument(0, $config['temp_directory']);
 
     }
 
