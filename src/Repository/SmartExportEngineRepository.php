@@ -27,14 +27,14 @@ class SmartExportEngineRepository extends ServiceEntityRepository
                 throw new \InvalidArgumentException('A SmartExportEngine already exists with this code '.$engine->getCode());
             }
         }
-        $this->_em->persist($engine);
-        $this->_em->flush();
+        $this->getEntityManager()->persist($engine);
+        $this->getEntityManager()->flush();
     }
 
     public function remove(SmartExportEngine $engine): void
     {
-        $this->_em->remove($engine);
-        $this->_em->flush();
+        $this->getEntityManager()->remove($engine);
+        $this->getEntityManager()->flush();
     }
 
 }

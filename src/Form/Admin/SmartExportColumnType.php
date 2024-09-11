@@ -12,18 +12,15 @@ use Odb\SmartExportBundle\Services\SmartExportQueryInterface;
 
 class SmartExportColumnType extends AbstractType
 {
-    protected $entity_choices = [];
+    protected array $entityChoices = [];
 
-    /**
-     * SmartExportEngineType constructor.
-     * @param SmartExportQueryInterface $queryService
-     */
+
     public function __construct(SmartExportQueryInterface $queryService)
     {
-        $this->entity_choices = $queryService->getAdminSelectClasses();
+        $this->entityChoices = $queryService->getAdminSelectClasses();
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('choiceLabel', TextType::class,[
@@ -72,7 +69,7 @@ class SmartExportColumnType extends AbstractType
         ; 
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => SmartExportColumn::class,

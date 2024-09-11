@@ -7,6 +7,7 @@ use PhpOffice\PhpSpreadsheet\Exception as SpreadSheetException;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as SpreadSheetWriterException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Odb\SmartExportBundle\Form\SmartExportType;
@@ -38,43 +39,28 @@ class SmartExport implements SmartExportInterface
     
     
 
-    private $request;
-    private $locale;
-    private $formFactory;
-    private $smartExportChoice;
-    private $smartExportQuery;
-    private $form;
-    private $rawData;
-    private $code;
-    private $slugger;
-    private $exportSettings;
-    private $smartExportEngineRepository;
+    private ?Request $request;
+    private string $locale;
+    private ?FormInterface $form;
+    private ?array $rawData;
+    private ?string $code;
 
-    /**
-     * @param SmartExportChoiceInterface $smartExportChoice
-     * @param SmartExportQueryInterface $smartExportQuery
-     * @param RequestStack $requestStack
-     * @param FormFactoryInterface $formFactory
-     * @param SluggerInterface $slugger
-     */
+    private ExportSettings $exportSettings;
+
     public function __construct(
-        SmartExportChoiceInterface $smartExportChoice,
-        SmartExportQueryInterface $smartExportQuery,
-        SmartExportEngineRepository $smartExportEngineRepository,
-        RequestStack $requestStack,
-        FormFactoryInterface $formFactory,
-        SluggerInterface $slugger
+        private readonly SmartExportChoiceInterface  $smartExportChoice,
+        private readonly SmartExportQueryInterface   $smartExportQuery,
+        private readonly SmartExportEngineRepository $smartExportEngineRepository,
+        private readonly RequestStack                $requestStack,
+        private readonly FormFactoryInterface        $formFactory,
+        private readonly SluggerInterface $slugger
     ){
         $this->request = $requestStack->getCurrentRequest();
         $this->locale = $requestStack->getCurrentRequest() ? $requestStack->getCurrentRequest()->getLocale() : 'en';
-        $this->formFactory = $formFactory;
-        $this->smartExportChoice = $smartExportChoice;
-        $this->smartExportQuery = $smartExportQuery;
-        $this->slugger = $slugger;
-        $this->smartExportEngineRepository = $smartExportEngineRepository;
     }
 
-    public function add(string $code, ?string $filename = null) {
+    public function add(string $code, ?string $filename = null): void
+    {
         $this->createForm($code);
         if($filename) {
             $this->exportSettings->setFilename($filename);
@@ -152,62 +138,43 @@ class SmartExport implements SmartExportInterface
     private function setRawData(): void
     {
         $this->rawData = $this->smartExportQuery->getDataFromExportSettings($this->exportSettings);
-        $this->exportSettings->setIsValid(is_array($this->rawData));
+        $this->exportSettings->setIsValid($this->rawData ?: false);
     }
 
-    /**
-     * @return null|FormInterface
-     */
+
     public function getForm(): ?FormInterface
     {
         return $this->form;
     }
 
-    /**
-     * @return null|array
-     */
     public function getRawData(): ?array
     {
         return $this->rawData;
     }
 
-    /**
-     * @return null|ExportSettings
-     */
     public function getSettings() :? ExportSettings
     {
         return $this->exportSettings;
     }
 
-    /**
-     * @return null|ExcelStyle
-     */
     public function getExcelStyle() :? ExcelStyle
     {
         return $this->exportSettings->getExcelStyle();
     }
 
-    /**
-     * @param ExcelStyle $excelStyle
-     * @return SmartExport
-     */
-    public function setExcelStyle(ExcelStyle $excelStyle) :self
+
+    public function setExcelStyle(ExcelStyle $excelStyle) :static
     {
         $this->exportSettings->setExcelStyle($excelStyle);
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getCode(): ?string
     {
         return $this->code;
     }
 
-    /**
-     * @return array|null
-     */
+
     public function getData(): ?array
     {
         return $this->getRawData();

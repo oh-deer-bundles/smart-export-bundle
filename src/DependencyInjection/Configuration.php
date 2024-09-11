@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('tbl_smart_export');
         $rootNode = $treeBuilder->getRootNode();
-        /** pur test not available  */
+        /** Pur test not available  */
         $rootNode
             ->children()
                 ->arrayNode('table_storage')

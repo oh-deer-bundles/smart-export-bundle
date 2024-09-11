@@ -17,19 +17,12 @@ use Odb\SmartExportBundle\Services\SmartExportChoiceInterface;
 
 class SmartExportType extends AbstractType
 {
-    private $exportChoice;
-
-    /**
-     * ExportType constructor.
-     * @param SmartExportChoiceInterface $exportChoice
-     */
     public function __construct(
-        SmartExportChoiceInterface $exportChoice)
+        private readonly SmartExportChoiceInterface $exportChoice)
     {
-        $this->exportChoice = $exportChoice;
     }
     
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         //$options['columns'] = $this->getFieldChoices($options['code_export']);
         $builder
@@ -72,7 +65,7 @@ class SmartExportType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => null,
@@ -81,7 +74,8 @@ class SmartExportType extends AbstractType
         ]);
     }
 
-    public function onPostSetData(FormEvent $event) {
+    public function onPostSetData(FormEvent $event): void
+    {
         $form = $event->getForm();
         $code_export = $event->getForm()->getConfig()->getOption('code_export');
         if($code_export) {

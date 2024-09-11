@@ -6,299 +6,176 @@ use Odb\SmartExportBundle\Entity\SmartExportEngine;
 
 class ExportSettings
 {
-    
-    /**
-     * @var SmartExportEngine
-     */
-    private $engine;
-    
-    /**
-     * @var array
-     */
-    private $columns = [];
 
-    /**
-     * @var string
-     */
-    private $code;
+    private SmartExportEngine $engine;
 
-    /**
-     * @var string|null
-     */
-    private $formattedCode;
+    private array $columns = [];
 
-    /**
-     * @var string
-     */
-    private $fileFormat;
+    private string $code;
 
-    /**
-     * @var string|null
-     */
-    private $fileExtension;
+    private ?string $formattedCode;
 
-    /**
-     * @var string|null
-     */
-    private $fileMime;
+    private string $fileFormat;
 
-    /**
-     * @var string
-     */
-    private $charset;
+    private ?string $fileExtension;
 
-    /**
-     * @var string
-     */
-    private $separator;
-    
-    /**
-     * @var string|null
-     */
-    private $locale;
+    private ?string $fileMime;
 
-    /**
-     * @var string|null
-     */
-    private $filename;
+    private string $charset;
 
-    
-    /**
-     * @var bool
-     */
-    private $isValid = false;
+    private string $separator;
 
-    /**
-     * @var \Odb\SmartExportBundle\Model\ExcelStyle|null
-     */
-    private $excelStyle;
-    
-    /**
-     * @return SmartExportEngine
-     */
+    private ?string $locale;
+
+    private ?string $filename;
+
+    private bool $isValid = false;
+
+    private ?ExcelStyle $excelStyle;
+
     public function getEngine(): SmartExportEngine
     {
         return $this->engine;
     }
 
-    /**
-     * @param SmartExportEngine $engine
-     */
     public function setEngine(SmartExportEngine $engine): void
     {
         $this->engine = $engine;
     }
 
-    /**
-     * @return array
-     */
     public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @param array $columns
-     */
-    public function setColumns(array $columns): self
+    public function setColumns(array $columns): static
     {
         $this->columns = $columns;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     * @return ExportSettings
-     */
-    public function setCode(string $code): self
+    public function setCode(string $code): static
     {
         $this->code = $code;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFormattedCode(): ?string
     {
         return $this->formattedCode;
     }
 
-    /**
-     * @param string|null $formattedCode
-     * @return ExportSettings
-     */
-    public function setFormattedCode(?string $formattedCode): self
+    public function setFormattedCode(?string $formattedCode): static
     {
         $this->formattedCode = $formattedCode;
         return $this;
     }
-    
-    /**
-     * @return string
-     */
+
     public function getFileFormat(): string
     {
         return $this->fileFormat;
     }
 
-    /**
-     * @param string $fileFormat
-     * @return ExportSettings
-     */
-    public function setFileFormat(string $fileFormat): self
+    public function setFileFormat(string $fileFormat): static
     {
         $this->fileFormat = $fileFormat;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFileExtension(): ?string
     {
         return $this->fileExtension;
     }
 
-    /**
-     * @param string|null $fileExtension
-     * @return ExportSettings
-     */
-    public function setFileExtension(?string $fileExtension): self
+    public function setFileExtension(?string $fileExtension): static
     {
         $this->fileExtension = $fileExtension;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFileMime(): ?string
     {
         return $this->fileMime;
     }
 
-    /**
-     * @param string|null $fileMime
-     * @return ExportSettings
-     */
-    public function setFileMime(?string $fileMime): self
+    public function setFileMime(?string $fileMime): static
     {
         $this->fileMime = $fileMime;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getCharset(): string
     {
         return $this->charset;
     }
 
-    /**
-     * @param string $charset
-     * @return ExportSettings
-     */
-    public function setCharset(string $charset): self
+    public function setCharset(string $charset): static
     {
         $this->charset = $charset;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getSeparator(): string
     {
         return $this->separator;
     }
 
-    /**
-     * @param string $separator
-     * @return ExportSettings
-     */
-    public function setSeparator(string $separator): self
+
+    public function setSeparator(string $separator): static
     {
         $this->separator = $separator;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getLocale(): ?string
     {
         return $this->locale;
     }
 
-    /**
-     * @param string|null $locale
-     * @return ExportSettings
-     */
-    public function setLocale(?string $locale): self
+    public function setLocale(?string $locale): static
     {
         $this->locale = $locale;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFilename(): ?string
     {
         return $this->filename;
     }
 
-    /**
-     * @param string|null $filename
-     * @return ExportSettings
-     */
-    public function setFilename(?string $filename): self
+    public function setFilename(?string $filename): static
     {
         $this->filename = $filename;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
+
     public function getIsValid(): bool
     {
         return $this->isValid;
     }
 
-    /**
-     * @param bool $isValid
-     * @return ExportSettings
-     */
-    public function setIsValid(bool $isValid): self
+
+    public function setIsValid(bool $isValid): static
     {
         $this->isValid = $isValid;
         return $this;
     }
 
-    /**
-     * @return ExcelStyle|null
-     */
+
     public function getExcelStyle(): ?ExcelStyle
     {
         return $this->excelStyle;
     }
 
-    /**
-     * @param ExcelStyle $excelStyle
-     */
-    public function setExcelStyle(ExcelStyle $excelStyle): void
+    public function setExcelStyle(ExcelStyle $excelStyle): static
     {
         $this->excelStyle = $excelStyle;
+        return $this;
     }
 }

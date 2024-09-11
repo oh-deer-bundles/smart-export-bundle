@@ -5,6 +5,7 @@ namespace Odb\SmartExportBundle\Services;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Odb\SmartExportBundle\Entity\SmartExportColumn;
 use Odb\SmartExportBundle\Entity\SmartExportEngine;
@@ -17,45 +18,39 @@ class SmartExportAdmin implements SmartExportAdminInterface
 {
     use SmartExportFinder;
     
-    private $request;
-    private $formFactory;
-    private $smartExportEngineRepository;
-    private $smartExportColumnRepository;
+    private ?Request $request;
 
 
-    /**
-     * @param RequestStack $requestStack
-     * @param FormFactoryInterface $formFactory
-     * @param SmartExportEngineRepository $smartExportEngineRepository
-     * @param SmartExportColumnRepository $smartExportColumnRepository
-     */
+
+
     public function __construct(
-        RequestStack $requestStack,
-        FormFactoryInterface $formFactory,
-        SmartExportEngineRepository $smartExportEngineRepository,
-        SmartExportColumnRepository $smartExportColumnRepository
+        private readonly RequestStack                $requestStack,
+        private readonly FormFactoryInterface        $formFactory,
+        private readonly SmartExportEngineRepository $smartExportEngineRepository,
+        private readonly SmartExportColumnRepository $smartExportColumnRepository
     ){
         $this->request = $requestStack->getCurrentRequest();
-        $this->formFactory = $formFactory;
-        $this->smartExportEngineRepository = $smartExportEngineRepository;
-        $this->smartExportColumnRepository = $smartExportColumnRepository;
     }
 
 
-    /**
-     * @param string $code
-     */
     public function removeEngine(string $code):void
     {
         $engine = $this->findByCode($code);
         $this->smartExportEngineRepository->remove($engine);
     }
 
+    public function toggleEngine(string $code):void
+    {
+        $engine = $this->findByCode($code);
+        $engine->setIsActive(!$engine->getIsActive());
+        $this->smartExportEngineRepository->save($engine);
+    }
+
     /**
      * @param string $redirectUrl
      * @return FormInterface|RedirectResponse
      */
-    public function handleFormNewEngine(string $redirectUrl) 
+    public function handleFormNewEngine(string $redirectUrl): RedirectResponse|FormInterface
     {
         $newEngine = new SmartExportEngine();
         $formEngine = $this->formFactory->createNamed('form_smart_export_engine_add', SmartExportEngineType::class, $newEngine);
@@ -75,7 +70,7 @@ class SmartExportAdmin implements SmartExportAdminInterface
      * @param string $redirectUrl
      * @return FormInterface|RedirectResponse
      */
-    public function handleFormEditEngine(string $code, string $redirectUrl)
+    public function handleFormEditEngine(string $code, string $redirectUrl): RedirectResponse|FormInterface
     {
         $engine = $this->findByCode($code);
 

@@ -12,18 +12,14 @@ use Odb\SmartExportBundle\Services\SmartExportQueryInterface;
 
 class SmartExportEngineType extends AbstractType
 {
-    protected $entity_choices = [];
+    protected array $entityChoices = [];
 
-    /**
-     * SmartExportEngineType constructor.
-     * @param SmartExportQueryInterface $queryService
-     */
     public function __construct(SmartExportQueryInterface $queryService)
     {
-        $this->entity_choices = $queryService->getAdminSelectClasses();
+        $this->entityChoices = $queryService->getAdminSelectClasses();
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('code', TextType::class,[
@@ -39,14 +35,14 @@ class SmartExportEngineType extends AbstractType
 
             ->add('className', ChoiceType::class, [
                 'label' => 'seb.class_name.label',
-                'choices'  => $this->entity_choices,
+                'choices'  => $this->entityChoices,
                 'required' => true,
                 'placeholder' => 'seb.class_name.placeholder'
             ])
         ; 
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => SmartExportEngine::class,

@@ -16,16 +16,12 @@ use Exception;
 
 class SmartExportQuery implements SmartExportQueryInterface
 {
-    private $entity_manager;
-    private $metas = [];
 
-    /**
-     * Test constructor.
-     * @param EntityManagerInterface $entity_manager
-     */
-    public function __construct(EntityManagerInterface $entity_manager)
+    private array $metas = [];
+
+
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->entity_manager = $entity_manager;
     }
 
     /**
@@ -206,13 +202,10 @@ class SmartExportQuery implements SmartExportQueryInterface
 
     /**
      * Create an ORM QueryBuilder and return the execution
-     * @param array $queryParameters
-     * @param string $primaryClassName
-     * @param string $primaryAlias
-     * @return int|array|string
      */
-    private function executeQuery( array $queryParameters, string $primaryClassName, string $primaryAlias){
-        $qb = new QueryBuilder($this->entity_manager);
+    private function executeQuery( array $queryParameters, string $primaryClassName, string $primaryAlias): int|array|string
+    {
+        $qb = new QueryBuilder($this->entityManager);
         $qb->from($primaryClassName, $primaryAlias);
         $joins = [];
         foreach ($queryParameters as $parameter){
@@ -321,7 +314,7 @@ class SmartExportQuery implements SmartExportQueryInterface
     private function getMetas(): array
     {
         if(!$this->metas){
-            $this->metas = $this->entity_manager->getMetadataFactory()->getAllMetadata();
+            $this->metas = $this->entityManager->getMetadataFactory()->getAllMetadata();
         }
         return $this->metas;
     }

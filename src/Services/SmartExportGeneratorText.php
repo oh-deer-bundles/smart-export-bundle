@@ -21,27 +21,23 @@ class SmartExportGeneratorText
      */
     public static function getSeparator(string $code = SmartExport::SEPARATOR_SEMICOLON) :string
     {
-        switch ($code){
-            case SmartExport::SEPARATOR_SEMICOLON:
-                return chr(59);
-            case SmartExport::SEPARATOR_COMMA:
-                return chr(44);
-            case SmartExport::SEPARATOR_TABULATION:
-                return chr(9);
-            case SmartExport::SEPARATOR_PIPE:
-                return chr(179);
-        }
+        return match ($code) {
+            SmartExport::SEPARATOR_SEMICOLON    => chr(59),
+            SmartExport::SEPARATOR_COMMA        => chr(44),
+            SmartExport::SEPARATOR_TABULATION   => chr(9),
+            SmartExport::SEPARATOR_PIPE         => chr(179),
+            default                             => chr(35),
+        };
 
-        return chr(35);
     }
 
     /**
-     * @param int|float|string $value
+     * @param float|int|string $value
      * @param string $charset default is SmartExport::CHARSET_UTF8 accept all from
      * @param string|null $locale
      * @return false|int|float|string
      */
-    public static function convert($value, string $charset = SmartExport::CHARSET_UTF8, string $locale = null)
+    public static function convert(float|int|string $value, string $charset = SmartExport::CHARSET_UTF8, string $locale = null): float|bool|int|string
     {
         if (is_string($value)) {
             if ($locale) {

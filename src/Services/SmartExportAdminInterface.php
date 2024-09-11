@@ -3,13 +3,16 @@
 namespace Odb\SmartExportBundle\Services;
 
 use Odb\SmartExportBundle\Entity\SmartExportEngine;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 interface SmartExportAdminInterface
 {
 
     public function removeEngine(string $code):void;
-    public function handleFormNewEngine(string $redirectUrl);
-    public function handleFormEditEngine(string $code, string $redirectUrl);
+    public function toggleEngine(string $code):void;
+    public function handleFormNewEngine(string $redirectUrl): RedirectResponse|FormInterface;
+    public function handleFormEditEngine(string $code, string $redirectUrl): RedirectResponse|FormInterface;
 
     /**
      * @inheritdoc

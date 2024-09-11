@@ -53,9 +53,9 @@ class SmartExportColumnRepository extends ServiceEntityRepository
 
     public function remove(SmartExportColumn $column, ?bool $withFlush = true): void
     {
-        $this->_em->remove($column);
+        $this->getEntityManager()->remove($column);
         if($withFlush) {
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 }

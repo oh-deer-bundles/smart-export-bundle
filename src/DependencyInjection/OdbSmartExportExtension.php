@@ -14,7 +14,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class OdbSmartExportExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    /**
+     * @throws \Exception
+     */
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.xml');
@@ -26,9 +29,6 @@ class OdbSmartExportExtension extends Extension
 //        $definition = $container->getDefinition('odb.cram.temp_file_manager');
 //        $definition->setArgument(0, $config['temp_directory']);
 
-
-        //dd($configs);
-        // TODO: Implement load() method.
     }
 
 }

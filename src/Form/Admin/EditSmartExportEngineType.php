@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class EditSmartExportEngineType extends SmartExportEngineType
 {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
         $builder

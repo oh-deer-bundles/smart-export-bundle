@@ -10,20 +10,20 @@ class SmartExportInterpreter
 {
     /**
      * @param string $interpreter
-     * can be 'integer', 'int', 'float', 'bool', 'boolean', 'string', 'date_'+format eg date_dmY, 'boolean_translated','money'
+     * can be 'integer', 'int', 'float', 'bool', 'boolean', 'string', 'date_'+format e.g. date_dmY, 'boolean_translated','money'
      * @param array $rules
      * allow_null (bool) if true the return can be null
      * In case $interpreter = boolean_translated :
      *      false_values (array) of values must be translated to false
      *      true_values (array) of values must be translated to true
      * In case of string :
-     *      prefix (mixed) : eg. prefix = "ali " and $raw_value = "baba" => "ali baba"
-     *      suffix (mixed) : eg. suffix = " 66" and $raw_value = "route" => "route 66"
-     *      append (bool) if true initial_value will be preserved and raw_value will be insert at end
-     *      prepend (bool) if true initial_value will be preserved and raw_value will be insert at begin
+     *      prefix (mixed) : e.g. prefix = "ali " and $raw_value = "baba" => "ali baba"
+     *      suffix (mixed) : e.g. suffix = " 66" and $raw_value = "route" => "route 66"
+     *      append (bool) if true initial_value will be preserved and raw_value will be inserted at end
+     *      prepend (bool) if true initial_value will be preserved and raw_value will be inserted at begin
      *      separator (string) in case of prepend or append you can specify a separator like "<br>" or "\n"
      * In case of money
-     *      currency (string) allowed value 'euro', 'dollard' (US) or symbol
+     *      currency (string) allowed value 'euro', 'dollar' (US) or symbol
      *      decimals (int) number of decimals default is 2
      *      thousand_separator (string) default is ' ' (white space)
      *      decimal_separator (string) default is ',' (comma)
@@ -32,7 +32,7 @@ class SmartExportInterpreter
      * @param null|string $file_format default will be SmartExport::FORMAT_TXT
      * @return float|int|string|null
      */
-    public static function translate(string $interpreter, array $rules, $raw_value = null, $initial_value = null, string $file_format = null)
+    public static function translate(string $interpreter, array $rules, $raw_value = null, $initial_value = null, string $file_format = null): float|int|string|null
     {
         if(!$file_format) {
             $file_format = SmartExport::FORMAT_TXT;
@@ -120,10 +120,10 @@ class SmartExportInterpreter
 
     /**
      * @param array $rules
-     * prefix (mixed) : eg. prefix = "ali " and $raw_value = "baba" => "ali baba"
-     * suffix (mixed) : eg. suffix = " 66" and $raw_value = "route" => "route 66"
-     * append (bool) if true initial_value will be preserved and raw_value will be insert at end
-     * prepend (bool) if true initial_value will be preserved and raw_value will be insert at begin
+     * prefix (mixed) : e.g. prefix = "ali " and $raw_value = "baba" => "ali baba"
+     * suffix (mixed) : e.g. suffix = " 66" and $raw_value = "route" => "route 66"
+     * append (bool) if true initial_value will be preserved and raw_value will be inserted at end
+     * prepend (bool) if true initial_value will be preserved and raw_value will be inserted at begin
      * separator (string) in case of prepend or append you can specify a separator like "<br>" or "\n"
      * @param null $raw_value
      * @param null $initial_value
@@ -161,13 +161,13 @@ class SmartExportInterpreter
      * preserve_time (bool) if true the time will be the same as $initial_value only in case the format skip h H i s
      * preserve_date (bool) if true the date will be the same as $initial_value only in case the format skip d m y Y
      * date_format (string) allowed values : d m y Y h H i s see https://www.php.net/manual/en/datetime.format.php
-     *                      eg. mdY or mdyHis in order you want
+     *                      e.g. mdY or mdyHis in order you want
      * @param DatetimeInterface|null $raw_value
      * @param string|null $file_format
      * if null the return will be 1st january 1970
      * @return string|int|null
      */
-    public static function formatDateTime(array $rules, DatetimeInterface  $raw_value = null, string $file_format = null)
+    public static function formatDateTime(array $rules, DatetimeInterface  $raw_value = null, string $file_format = null): int|string|null
     {
 //        if(!array_key_exists('date_format', $rules)){
 //            throw new \Exception('No date_format set');
@@ -191,7 +191,7 @@ class SmartExportInterpreter
     }
 
     /**
-     * Is conditional bool eg. you need true when value is equal 'bar'
+     * Is conditional bool e.g. you need true when value is equal 'bar'
      * @param array $rules
      * allow_null (bool) if true the return can be null
      * false_values (array) of values must be translated to false
@@ -223,7 +223,7 @@ class SmartExportInterpreter
 
     /**
      * @param array $rules
-     *      currency (string) allowed value 'euro', 'dollard' (US) or symbol
+     *      currency (string) allowed value 'euro', 'dollar' (US) or symbol
      *      decimals (int) number of decimals default is 2
      *      thousand_separator (string) default is ' ' (white space)
      *      decimal_separator (string) default is ',' (comma)
@@ -244,7 +244,7 @@ class SmartExportInterpreter
                     case 'euro':
                         $symbol = '€';
                         break;
-                    case 'dollard':
+                    case 'dollar':
                         $symbol = '$';
                         $way = 'prepend';
                         break;

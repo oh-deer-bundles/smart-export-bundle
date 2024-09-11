@@ -10,20 +10,11 @@ use Odb\SmartExportBundle\Repository\SmartExportEngineRepository;
 
 class SmartExportChoice implements SmartExportChoiceInterface
 {
-    private $exportEngineRepository;
-    private $exportColumnRepository;
 
-    /**
-     * SmartExportChoice constructor.
-     * @param SmartExportEngineRepository $exportEngineRepository
-     * @param SmartExportColumnRepository $exportColumnRepository
-     */
     public function __construct(
-        SmartExportEngineRepository $exportEngineRepository,
-        SmartExportColumnRepository $exportColumnRepository
+        private readonly SmartExportEngineRepository $exportEngineRepository,
+        private readonly SmartExportColumnRepository $exportColumnRepository
     ) {
-        $this->exportEngineRepository = $exportEngineRepository;
-        $this->exportColumnRepository = $exportColumnRepository;
     }
 
     /**

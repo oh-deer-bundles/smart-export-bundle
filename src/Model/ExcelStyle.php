@@ -8,343 +8,205 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ExcelStyle
 {
-    /**
-     * @var string
-     */
-    private $fontFamily = 'Calibri';
 
-    /**
-     * @var int
-     */
-    private $fontSizeSmall = 9;
+    private string $fontFamily = 'Calibri';
 
-    /**
-     * @var int
-     */
-    private $fontSizeMedium = 11;
+    private int $fontSizeSmall = 9;
 
-    /**
-     * @var int
-     */
-    private $fontSizeLarge = 14;
+    private int $fontSizeMedium = 11;
 
-    /**
-     * @var int
-     */
-    private $fontSizeExtraLarge = 18;
+    private int $fontSizeLarge = 14;
 
-    /**
-     * @var string
-     */
-    private $numerFormat5 = '#,#####0.00000';
+    private int $fontSizeExtraLarge = 18;
 
-    /**
-     * @var string
-     */
-    private $colorCellRed = 'D50000';
+    private string $numberFormat5 = '#,#####0.00000';
 
-    /**
-     * @var string
-     */
-    private $colorCellGreen = '2E7D32';
+    private string $colorCellRed = 'D50000';
 
-    /**
-     * @var string
-     */
-    private $colorCellBlue = '0277BD';
+    private string $colorCellGreen = '2E7D32';
 
-    /**
-     * @var string
-     */
-    private $colorCellOrange = 'FFA000';
+    private string $colorCellBlue = '0277BD';
 
-    /**
-     * @var string
-     */
-    private $colorCellYellow = 'FFD600';
+    private string $colorCellOrange = 'FFA000';
 
-    /**
-     * @var string
-     */
-    private $colorTextRed = 'C62828';
+    private string $colorCellYellow = 'FFD600';
 
-    /**
-     * @var string
-     */
-    private $colorTextGreen = '1B5E20';
+    private string $colorTextRed = 'C62828';
 
-    /**
-     * @var string
-     */
-    private $colorTextBlue = '0277BD';
+    private string $colorTextGreen = '1B5E20';
 
-    /**
-     * @var array
-     */
-    private $main_style;
+    private string $colorTextBlue = '0277BD';
 
-    /**
-     * @var array
-     */
-    private $main_style_left;
+    private array $main_style;
 
-    /**
-     * @var array
-     */
-    private $main_style_center;
+    private array $main_style_left;
 
-    /**
-     * @var array
-     */
-    private $main_style_right;
+    private array $main_style_center;
 
-    /**
-     * @var array
-     */
-    private $head_style;
+    private array $main_style_right;
 
-    /**
-     * @var array[]
-     */
-    private $title_1;
+    private array $head_style;
 
-    /**
-     * @var array[]
-     */
-    private $title_2;
+    private array $title_1;
 
-    /**
-     * @var array[]
-     */
-    private $title_3;
+    private array $title_2;
 
-    /**
-     * @return string
-     */
+    private array $title_3;
+
     public function getFontFamily(): string
     {
         return $this->fontFamily;
     }
 
-    /**
-     * @param string $fontFamily
-     */
-    public function setFontFamily(string $fontFamily): void
+    public function setFontFamily(string $fontFamily): static
     {
         $this->fontFamily = $fontFamily;
+        return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFontSizeSmall(): int
     {
         return $this->fontSizeSmall;
     }
 
-    /**
-     * @param int $fontSizeSmall
-     */
-    public function setFontSizeSmall(int $fontSizeSmall): void
+    public function setFontSizeSmall(int $fontSizeSmall): static
     {
         $this->fontSizeSmall = $fontSizeSmall;
+        return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFontSizeMedium(): int
     {
         return $this->fontSizeMedium;
     }
 
-    /**
-     * @param int $fontSizeMedium
-     */
-    public function setFontSizeMedium(int $fontSizeMedium): void
+    public function setFontSizeMedium(int $fontSizeMedium): static
     {
         $this->fontSizeMedium = $fontSizeMedium;
+        return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFontSizeLarge(): int
     {
         return $this->fontSizeLarge;
     }
 
-    /**
-     * @param int $fontSizeLarge
-     */
-    public function setFontSizeLarge(int $fontSizeLarge): void
+    public function setFontSizeLarge(int $fontSizeLarge): static
     {
         $this->fontSizeLarge = $fontSizeLarge;
+        return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getFontSizeExtraLarge(): int
     {
         return $this->fontSizeExtraLarge;
     }
 
-    /**
-     * @param int $fontSizeExtraLarge
-     */
-    public function setFontSizeExtraLarge(int $fontSizeExtraLarge): void
+    public function setFontSizeExtraLarge(int $fontSizeExtraLarge): static
     {
         $this->fontSizeExtraLarge = $fontSizeExtraLarge;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getNumerFormat5(): string
+    public function getNumberFormat5(): string
     {
-        return $this->numerFormat5;
+        return $this->numberFormat5;
     }
 
-    /**
-     * @param string $numerFormat5
-     */
-    public function setNumerFormat5(string $numerFormat5): void
+    public function setNumberFormat5(string $numberFormat5): static
     {
-        $this->numerFormat5 = $numerFormat5;
+        $this->numberFormat5 = $numberFormat5;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorCellRed(): string
     {
         return $this->colorCellRed;
     }
 
-    /**
-     * @param string $colorCellRed
-     */
-    public function setColorCellRed(string $colorCellRed): void
+    public function setColorCellRed(string $colorCellRed): static
     {
         $this->colorCellRed = $colorCellRed;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorCellGreen(): string
     {
         return $this->colorCellGreen;
     }
 
-    /**
-     * @param string $colorCellGreen
-     */
-    public function setColorCellGreen(string $colorCellGreen): void
+    public function setColorCellGreen(string $colorCellGreen): static
     {
         $this->colorCellGreen = $colorCellGreen;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorCellBlue(): string
     {
         return $this->colorCellBlue;
     }
 
-    /**
-     * @param string $colorCellBlue
-     */
-    public function setColorCellBlue(string $colorCellBlue): void
+    public function setColorCellBlue(string $colorCellBlue): static
     {
         $this->colorCellBlue = $colorCellBlue;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorCellOrange(): string
     {
         return $this->colorCellOrange;
     }
 
-    /**
-     * @param string $colorCellOrange
-     */
-    public function setColorCellOrange(string $colorCellOrange): void
+    public function setColorCellOrange(string $colorCellOrange): static
     {
         $this->colorCellOrange = $colorCellOrange;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorCellYellow(): string
     {
         return $this->colorCellYellow;
     }
 
-    /**
-     * @param string $colorCellYellow
-     */
-    public function setColorCellYellow(string $colorCellYellow): void
+    public function setColorCellYellow(string $colorCellYellow): static
     {
         $this->colorCellYellow = $colorCellYellow;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorTextRed(): string
     {
         return $this->colorTextRed;
     }
 
-    /**
-     * @param string $colorTextRed
-     */
-    public function setColorTextRed(string $colorTextRed): void
+    public function setColorTextRed(string $colorTextRed): static
     {
         $this->colorTextRed = $colorTextRed;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorTextGreen(): string
     {
         return $this->colorTextGreen;
     }
 
-    /**
-     * @param string $colorTextGreen
-     */
-    public function setColorTextGreen(string $colorTextGreen): void
+    public function setColorTextGreen(string $colorTextGreen): static
     {
         $this->colorTextGreen = $colorTextGreen;
+        return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColorTextBlue(): string
     {
         return $this->colorTextBlue;
     }
 
-    /**
-     * @param string $colorTextBlue
-     */
-    public function setColorTextBlue(string $colorTextBlue): void
+    public function setColorTextBlue(string $colorTextBlue): static
     {
         $this->colorTextBlue = $colorTextBlue;
+        return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getMainStyle(): array
     {
         return $this->main_style ?? [
@@ -365,9 +227,10 @@ class ExcelStyle
     /**
      * @param array $main_style
      */
-    public function setMainStyle(array $main_style): void
+    public function setMainStyle(array $main_style): static
     {
         $this->main_style = $main_style;
+        return $this;
     }
 
     /**
@@ -396,9 +259,10 @@ class ExcelStyle
     /**
      * @param array $main_style_left
      */
-    public function setMainStyleLeft(array $main_style_left): void
+    public function setMainStyleLeft(array $main_style_left): static
     {
         $this->main_style_left = $main_style_left;
+        return $this;
     }
 
     /**
@@ -428,9 +292,10 @@ class ExcelStyle
     /**
      * @param array $main_style_center
      */
-    public function setMainStyleCenter(array $main_style_center): void
+    public function setMainStyleCenter(array $main_style_center): static
     {
         $this->main_style_center = $main_style_center;
+        return $this;
     }
 
     /**
@@ -460,9 +325,10 @@ class ExcelStyle
     /**
      * @param array $main_style_right
      */
-    public function setMainStyleRight(array $main_style_right): void
+    public function setMainStyleRight(array $main_style_right): static
     {
         $this->main_style_right = $main_style_right;
+        return $this;
     }
 
     /**
@@ -500,9 +366,10 @@ class ExcelStyle
     /**
      * @param array $head_style
      */
-    public function setHeadStyle(array $head_style): void
+    public function setHeadStyle(array $head_style): static
     {
         $this->head_style = $head_style;
+        return $this;
     }
 
     /**
@@ -524,9 +391,10 @@ class ExcelStyle
     /**
      * @param array[] $title_1
      */
-    public function setTitle1(array $title_1): void
+    public function setTitle1(array $title_1): static
     {
         $this->title_1 = $title_1;
+        return $this;
     }
 
     /**
@@ -548,9 +416,10 @@ class ExcelStyle
     /**
      * @param array[] $title_2
      */
-    public function setTitle2(array $title_2): void
+    public function setTitle2(array $title_2): static
     {
         $this->title_2 = $title_2;
+        return $this;
     }
 
     /**
@@ -572,9 +441,10 @@ class ExcelStyle
     /**
      * @param array[] $title_3
      */
-    public function setTitle3(array $title_3): void
+    public function setTitle3(array $title_3): static
     {
         $this->title_3 = $title_3;
+        return $this;
     }
 
     /**

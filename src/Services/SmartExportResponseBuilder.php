@@ -11,14 +11,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SmartExportResponseBuilder
 {
-    /**
-     * @param array $rawData
-     * @param ExportSettings $exportSettings
-     * @return BinaryFileResponse|StreamedResponse
-     * @throws SpreadSheetException
-     * @throws SpreadSheetWriterException
-     */
-    public static function getResponse(array $rawData, ExportSettings $exportSettings)
+
+    public static function getResponse(array $rawData, ExportSettings $exportSettings): BinaryFileResponse|StreamedResponse
     {
         if (!$exportSettings->getFilename()) {
             $exportSettings->setFilename(self::generateDefaultFilename($exportSettings));
@@ -35,20 +29,12 @@ class SmartExportResponseBuilder
      */
     private static function generateDefaultFilename(ExportSettings $exportSettings) :string
     {
-        switch($exportSettings->getFileFormat()) {
-            case SmartExport::FORMAT_CSV:
-                $extension = 'csv';
-                break;
-            case SmartExport::FORMAT_EXCEL_XLSX:
-                $extension = 'xlsx';
-                break;
-            case SmartExport::FORMAT_EXCEL_XLS:
-                $extension = 'xls';
-                break;
-            default:
-                $extension = 'txt';
-                break;
-        }
+        $extension = match ($exportSettings->getFileFormat()) {
+            SmartExport::FORMAT_CSV => 'csv',
+            SmartExport::FORMAT_EXCEL_XLSX => 'xlsx',
+            SmartExport::FORMAT_EXCEL_XLS => 'xls',
+            default => 'txt',
+        };
         $now = new DateTime('now');
         $filename = $now->format('y-m-d-H-i').'_'.$exportSettings->getFormattedCode().'.';
         $filename .= $extension;
