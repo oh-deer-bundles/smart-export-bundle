@@ -12,17 +12,6 @@ of the Composer documentation.
 Applications that use Symfony Flex
 ----------------------------------
 
-Open a command console, enter your project directory and execute:
-
-```console
-$ composer require oh-deer-bundles/smart-export-bundle
-```
-
-Applications that don't use Symfony Flex
-----------------------------------------
-
-### Step 1: Download the Bundle
-
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
@@ -30,26 +19,18 @@ following command to download the latest stable version of this bundle:
 $ composer require oh-deer-bundles/smart-export-bundle
 ```
 
-### Step 2: Enable the Bundle
+Then you must create tables of this bundle.
 
-Then, enable the bundle by adding it to the list of registered bundles
-in the `config/bundles.php` file of your project:
-
-```php
-// config/bundles.php
-
-return [
-    // ...
-    Odb\SmartExportBundle\OdbSmartExportBundle::class => ['all' => true],
-];
+```console
+$ php bin/console make:migration
+$ php bin/console doctrine:migration:migrate
 ```
+Now you are able to create your first export. A basic admin interface are available on http://yourdomain.com/seb/admin. 
+So you must secure this route you can change this in the file config/route/odb.yaml
 
-### Step 3: Create tables
+You can build your own admin and export pages. In this case, don't forget to remove the odb.yaml routes files.
 
+To build your own pages you can follow the AdminController included in the bundle.
 
-### Step 4: Import js and scss
-
-
-### 
 
 
