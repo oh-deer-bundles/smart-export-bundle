@@ -22,9 +22,16 @@ class SmartExportEngineType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('name', TextType::class,[
+                    'label' => 'seb.name.label',
+                    'help' => 'seb.name.helper',
+                    'required' => true,
+            ])
+
             ->add('code', TextType::class,[
                     'label' => 'seb.code.label',
-                    'help' => 'seb.code.helper'
+                    'help' => 'seb.code.helper',
+                    'required' => false,
             ])
 
             ->add('description', TextType::class,[

@@ -3,21 +3,21 @@ odb_smart_export_admin_index:
     controller: odb.smart-export.controller.admin::index
 
 odb_smart_export_admin_edit:
-    path: /admin/edit/{code}
+    path: /admin/edit/{uuid}
     controller: odb.smart-export.controller.admin::edit
 
 odb_smart_export_admin_toggle:
-    path: /admin/toggle/{code}
+    path: /admin/toggle/{uuid}
     controller: odb.smart-export.controller.admin::toggle
 
 odb_smart_export_admin_remove:
-    path: /admin/remove/{code}
-    controller: odb.smart-export.controller.admin::toggle
+    path: /admin/remove/{uuid}
+    controller: odb.smart-export.controller.admin::remove
 
 odb_smart_export_admin_data_structure:
     path: /admin/data-structure/{token}
     controller: odb.smart-export.controller.admin::getDataStructure
 
 odb_smart_export_admin_demo_export:
-    path: /admin/demo-export/{code}
+    path: /admin/demo-export/{uuid}
     controller: odb.smart-export.controller.admin::demoExport

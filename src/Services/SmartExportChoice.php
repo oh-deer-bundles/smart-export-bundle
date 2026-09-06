@@ -18,12 +18,12 @@ class SmartExportChoice implements SmartExportChoiceInterface
     }
 
     /**
-     * @param string $engineCode
+     * @param string $engineUuid
      * @return array
      */
-    public function getChoices(string $engineCode) :array
+    public function getChoices(string $engineUuid) :array
     {
-        $choices_em = $this->exportColumnRepository->getChoicesByEngineCode($engineCode);
+        $choices_em = $this->exportColumnRepository->getChoicesByEngineUuid($engineUuid);
         $response = [];
         $columnGroups = [];
         $cellGroups = [];
@@ -55,18 +55,18 @@ class SmartExportChoice implements SmartExportChoiceInterface
     }
 
     /**
-     * @param string $engineCode
+     * @param string $engineUuid
      * @param string $export_fields_value
      * @return array
      */
-    public function parseChoices(string $engineCode, string $export_fields_value):array
+    public function parseChoices(string $engineUuid, string $export_fields_value):array
     {
 
         $response = [
             'columns' => [],
-            'engine' => $this->exportEngineRepository->findOneBy(['code'=> $engineCode])
+            'engine' => $this->exportEngineRepository->findOneBy(['uuid'=> $engineUuid])
         ];
-        $columns_em = $this->exportColumnRepository->getColumnsByEngineCode($engineCode);
+        $columns_em = $this->exportColumnRepository->getColumnsByEngineUuid($engineUuid);
         $selectedKeys = [];
         $selectedColumns = json_decode($export_fields_value, true);
         $columns = [];

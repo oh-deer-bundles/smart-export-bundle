@@ -33,15 +33,15 @@ class SmartExportAdmin implements SmartExportAdminInterface
     }
 
 
-    public function removeEngine(string $code):void
+    public function removeEngine(string $uuid):void
     {
-        $engine = $this->findByCode($code);
+        $engine = $this->findByUuid($uuid);
         $this->smartExportEngineRepository->remove($engine);
     }
 
-    public function toggleEngine(string $code):void
+    public function toggleEngine(string $uuid):void
     {
-        $engine = $this->findByCode($code);
+        $engine = $this->findByUuid($uuid);
         $engine->setEnabled(!$engine->isEnabled());
         $this->smartExportEngineRepository->save($engine);
     }
@@ -58,7 +58,7 @@ class SmartExportAdmin implements SmartExportAdminInterface
         if($formEngine->isSubmitted() && $formEngine->isValid()) {
             $newEngine->setEnabled(true);
             $this->smartExportEngineRepository->save($newEngine);
-            $url = str_replace('code', $newEngine->getCode(), $redirectUrl);
+            $url = str_replace('uuid', $newEngine->getUuid(), $redirectUrl);
             return new RedirectResponse($url);
         }
      
@@ -66,13 +66,13 @@ class SmartExportAdmin implements SmartExportAdminInterface
     }
 
     /**
-     * @param string $code
+     * @param string $uuid
      * @param string $redirectUrl
      * @return FormInterface|RedirectResponse
      */
-    public function handleFormEditEngine(string $code, string $redirectUrl): RedirectResponse|FormInterface
+    public function handleFormEditEngine(string $uuid, string $redirectUrl): RedirectResponse|FormInterface
     {
-        $engine = $this->findByCode($code);
+        $engine = $this->findByUuid($uuid);
 
         /** array of columns will be used when the form is submitted to check if we need to remove some columns */
         $initialsColumns = [];
@@ -108,7 +108,7 @@ class SmartExportAdmin implements SmartExportAdminInterface
             }
 
             $this->smartExportEngineRepository->save($engine);
-            $url = str_replace('code', $engine->getCode(), $redirectUrl);
+            $url = str_replace('uuid', $engine->getUuid(), $redirectUrl);
             return new RedirectResponse($url);
         }
 

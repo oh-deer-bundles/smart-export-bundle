@@ -21,12 +21,6 @@ class SmartExportEngineRepository extends ServiceEntityRepository
 
     public function save(SmartExportEngine $engine): void
     {
-        if(!$engine->getId()) {
-            $checkCodeEngine = $this->findOneBy(['code' => $engine->getCode()]);
-            if($checkCodeEngine instanceof SmartExportEngine){
-                throw new \InvalidArgumentException('A SmartExportEngine already exists with this code '.$engine->getCode());
-            }
-        }
         $this->getEntityManager()->persist($engine);
         $this->getEntityManager()->flush();
     }

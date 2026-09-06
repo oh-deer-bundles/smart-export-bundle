@@ -72,7 +72,15 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>seb.code.helper</source>
-                <target>This code must be unique.</target>
+                <target>Optional free-form code, not required to be unique.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>seb.name.label</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>seb.name.helper</source>
+                <target>Display name of this export.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>seb.description.label</source>

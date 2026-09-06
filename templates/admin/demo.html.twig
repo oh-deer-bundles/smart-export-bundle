@@ -1,101 +1,52 @@
 {% extends '@OdbSmartExport/_layout.html.twig' %}
-{% form_theme formExport 'bootstrap_5_layout.html.twig' %}
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .smart_export_container [data-draggable=target] {
-            float: left;
-            list-style-type: none;
-            width: 100%;
-            height: 200px;
-            overflow-y: auto;
-            margin: 0 0.5rem 0.5rem 0;
-            padding: 0.5rem;
-            border: 1px solid #0277BD;
-            border-radius: 3px;
-            background: #FFFFFF;
-            color: #000000;
-        }
-        .smart_export_container [data-draggable=item] {
-            display: block;
-            list-style-type: none;
-            margin: 0 0 2px 0;
-            padding: 1px 6px 2px;
-            border-radius: 2px;
-        }
-        .smart_export_container [data-draggable=item]:hover {
-            background-color: #CFD8DC;
-            color: #0277BD;
-        }
-        .smart_export_container [data-draggable=item].selected {
-            background-color: #0277BD;
-            color: #FFFFFF;
-        }
-        .smart_export_container [data-draggable=item].selected:hover {
-            color: #CFD8DC;
-            background-color: #0287d6;
-        }
-        .smart_export_container button.for-field {
-            display: block;
-            width: 32px;
-        }
-        .smart_export_container button.for-field i {
-            margin: 0;
-        }
-    </style>
-{% endblock %}
-{% block javascripts %}
-    {{ parent() }}
-    <script type="module">
-        import SmartSelector from "{{ asset('bundles/odbsmartexport/js/smart_selector.js') }}";
-        import { Controller } from "https://unpkg.com/@hotwired/stimulus/dist/stimulus.js"
-        Stimulus.register("smart-export", class extends Controller {
-            se;
-            connect(){
-                this.se = new SmartSelector({container: this.element});
-            }
-        });
-    </script>
-{% endblock %}
+{% form_theme formExport '@OdbSmartExport/form/tailwind_layout.html.twig' %}
 {% block body %}
-    <div class="row">
-    <div class="col-12">
-        <h1 class="text-center">Index admin bundle</h1>
-    </div>
-    <div class="col-12">
-        {{ form_start(formExport, {'attr': {
-            'action': url('odb_smart_export_admin_demo_export',{'code':code,'token': csrf_token('export_generate')}),
-        }}) }}
-        <div class="row mb-3 smart_export_container justify-content-between align-items-center" {{ stimulus_controller('smart-export') }}>
-            <div class="col-5">
-                <ul data-draggable="target" class="available">
+    <turbo-frame id="demo-export-frame" class="block w-full">
+        <div data-controller="dual-list" class="w-full space-y-6">
+            {{ form_start(formExport, {'attr': {
+                'data-turbo': 'false',
+                'action': url('odb_smart_export_admin_demo_export',{'uuid':uuid,'token': csrf_token('export_generate')}),
+            }}) }}
+
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Demo export</h2>
+
+            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+                <ul data-dual-list-target="available" data-action="dragover->dual-list#allowDrop drop->dual-list#dropOnAvailable"
+                    class="h-52 list-none overflow-y-auto rounded-md border border-slate-300 bg-white p-2 text-sm dark:border-slate-700 dark:bg-slate-800">
                     {% for choiceView in formExport.choices.vars.choices %}
-                        <li data-draggable="item" data-value="{{ choiceView.value }}">{{ choiceView.label }}</li>
+                        <li draggable="true" data-dual-list-target="item" data-value="{{ choiceView.value }}"
+                            data-action="click->dual-list#toggleSelect dragstart->dual-list#dragStart"
+                            class="cursor-pointer select-none rounded px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-700">{{ choiceView.label }}</li>
                     {% endfor %}
                     {% do formExport.choices.setRendered %}
                 </ul>
-            </div>
-            <div class="col-2 d-flex flex-column align-items-center justify-content-center">
-                <button type="button" class="btn btn-sm btn-primary mb-2 for-field disabled choose_all">>></button>
-                <button type="button" class="btn btn-sm btn-outline-primary mb-2  for-field disabled choose_selected">></button>
-                <button type="button" class="btn btn-sm btn-outline-primary mb-2  for-field disabled reset_selected"><</button>
-                <button type="button" class="btn btn-sm btn-primary mb-2  for-field disabled reset_all"><<</button>
-            </div>
-            <div class="col-5">
-                <ul data-draggable="target" class="chosen"></ul>
-            </div>
-            {{ form_widget(formExport.fields) }}
-        </div>
-        {{ form_row(formExport.file_format) }}
-        {{ form_row(formExport.separator) }}
-        {{ form_row(formExport.charset) }}
-        <button type="submit"> Generate</button>
-        {{ form_end(formExport) }}
-    </div>
-    </div>
-    <div class="row">
-        <div class="col">
 
+                <div class="flex flex-col gap-2">
+                    <button type="button" data-dual-list-target="chooseAll" data-action="click->dual-list#chooseAll"
+                            class="rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-700">&raquo;</button>
+                    <button type="button" data-dual-list-target="chooseSelected" data-action="click->dual-list#chooseSelected"
+                            class="rounded-md bg-indigo-100 px-2 py-1 text-sm text-indigo-700 hover:bg-indigo-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:bg-indigo-900/40 dark:text-indigo-200 dark:hover:bg-indigo-900/60 dark:disabled:bg-slate-800 dark:disabled:text-slate-600">&rsaquo;</button>
+                    <button type="button" data-dual-list-target="resetSelected" data-action="click->dual-list#resetSelected"
+                            class="rounded-md bg-indigo-100 px-2 py-1 text-sm text-indigo-700 hover:bg-indigo-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:bg-indigo-900/40 dark:text-indigo-200 dark:hover:bg-indigo-900/60 dark:disabled:bg-slate-800 dark:disabled:text-slate-600">&lsaquo;</button>
+                    <button type="button" data-dual-list-target="resetAll" data-action="click->dual-list#resetAll"
+                            class="rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-700">&laquo;</button>
+                </div>
+
+                <ul data-dual-list-target="chosen" data-action="dragover->dual-list#allowDrop drop->dual-list#dropOnChosen"
+                    class="h-52 list-none overflow-y-auto rounded-md border border-slate-300 bg-white p-2 text-sm dark:border-slate-700 dark:bg-slate-800"></ul>
+            </div>
+
+            {{ form_widget(formExport.fields, {'attr': {'data-dual-list-target': 'input'}}) }}
+
+            {{ form_row(formExport.file_format) }}
+            {{ form_row(formExport.separator) }}
+            {{ form_row(formExport.charset) }}
+
+            <div class="flex justify-end">
+                <button type="submit"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">Generate</button>
+            </div>
+            {{ form_end(formExport) }}
         </div>
-    </div>
+    </turbo-frame>
 {% endblock %}

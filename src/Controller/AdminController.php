@@ -30,7 +30,7 @@ class AdminController extends AbstractController
 
     public function index(Request $request): Response
     {
-        $redirectUrl = $this->generateUrl('odb_smart_export_admin_edit', ['code' => 'code']);
+        $redirectUrl = $this->generateUrl('odb_smart_export_admin_edit', ['uuid' => 'uuid']);
 
         $renderParameter = [];
         $handlerResponse = $this->smartExportAdmin->handleFormNewEngine($redirectUrl);
@@ -52,10 +52,10 @@ class AdminController extends AbstractController
     }
 
 
-    public function edit(string $code, Request $request): Response
+    public function edit(string $uuid, Request $request): Response
     {
         $redirectUrl = $this->generateUrl('odb_smart_export_admin_index');
-        $handlerResponse = $this->smartExportAdmin->handleFormEditEngine($code, $redirectUrl);
+        $handlerResponse = $this->smartExportAdmin->handleFormEditEngine($uuid, $redirectUrl);
 
         if ($handlerResponse instanceof RedirectResponse) {
             if ($request->isXmlHttpRequest()) {
@@ -75,18 +75,18 @@ class AdminController extends AbstractController
         }
 
 
-        return $this->render('@OdbSmartExport/admin/edit.html.twig', ['formEditEngine' => $handlerResponse, 'code' => $code]);
+        return $this->render('@OdbSmartExport/admin/edit.html.twig', ['formEditEngine' => $handlerResponse, 'uuid' => $uuid]);
     }
 
-    public function toggle(string $code): RedirectResponse
+    public function toggle(string $uuid): RedirectResponse
     {
-        $this->smartExportAdmin->toggleEngine($code);
+        $this->smartExportAdmin->toggleEngine($uuid);
         return $this->redirectToRoute('odb_smart_export_admin_index');
     }
 
-    public function remove(string $code): RedirectResponse
+    public function remove(string $uuid): RedirectResponse
     {
-        $this->smartExportAdmin->removeEngine($code);
+        $this->smartExportAdmin->removeEngine($uuid);
         return $this->redirectToRoute('odb_smart_export_admin_index');
     }
 
@@ -214,9 +214,9 @@ class AdminController extends AbstractController
         );
     }
 
-    public function demoExport(string $code)
+    public function demoExport(string $uuid)
     {
-        $formExport = $this->smartExport->createForm($code);
+        $formExport = $this->smartExport->createForm($uuid);
         $isValid = $this->smartExport->handleFrom();
         if ($isValid) {
             return $this->smartExport->getResponse();
@@ -224,7 +224,7 @@ class AdminController extends AbstractController
 
         return $this->render('@OdbSmartExport/admin/demo.html.twig', [
             'formExport' => $formExport,
-            'code' => $code
+            'uuid' => $uuid
         ]);
     }
 }

@@ -24,7 +24,7 @@ class SmartExportType extends AbstractType
     
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        //$options['columns'] = $this->getFieldChoices($options['code_export']);
+        //$options['columns'] = $this->getFieldChoices($options['uuid_export']);
         $builder
             ->add('file_format', ChoiceType::class, array(
                 'required'  => true,
@@ -69,7 +69,7 @@ class SmartExportType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
-            'code_export' => null,
+            'uuid_export' => null,
             'translation_domain' => 'smart_export_bundle_forms',
         ]);
     }
@@ -77,11 +77,11 @@ class SmartExportType extends AbstractType
     public function onPostSetData(FormEvent $event): void
     {
         $form = $event->getForm();
-        $code_export = $event->getForm()->getConfig()->getOption('code_export');
-        if($code_export) {
+        $uuid_export = $event->getForm()->getConfig()->getOption('uuid_export');
+        if($uuid_export) {
             $choices =
             $form->add('choices', ChoiceType::class, [
-                'choices' =>  $this->exportChoice->getChoices($code_export),
+                'choices' =>  $this->exportChoice->getChoices($uuid_export),
                 'label'     => null,
                 'required'    => false,
                 'mapped'    => false,

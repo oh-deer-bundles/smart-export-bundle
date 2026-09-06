@@ -37,14 +37,14 @@ trait SmartExportFinder
     }
 
     /**
-     * @param string $code
+     * @param string $uuid
      * @return SmartExportEngine
      */
-    public function findByCode(string $code):SmartExportEngine
+    public function findByUuid(string $uuid):SmartExportEngine
     {
-        $engine = $this->smartExportEngineRepository->findOneBy(['code'=> $code]);
+        $engine = $this->smartExportEngineRepository->findOneBy(['uuid'=> $uuid]);
         if(!$engine instanceof SmartExportEngine) {
-            throw new InvalidArgumentException('No SmartExportEngine found with this code : '.$code);
+            throw new InvalidArgumentException('No SmartExportEngine found with this uuid : '.$uuid);
         }
         return $engine;
     }

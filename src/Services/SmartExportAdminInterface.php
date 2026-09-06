@@ -9,10 +9,10 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 interface SmartExportAdminInterface
 {
 
-    public function removeEngine(string $code):void;
-    public function toggleEngine(string $code):void;
+    public function removeEngine(string $uuid):void;
+    public function toggleEngine(string $uuid):void;
     public function handleFormNewEngine(string $redirectUrl): RedirectResponse|FormInterface;
-    public function handleFormEditEngine(string $code, string $redirectUrl): RedirectResponse|FormInterface;
+    public function handleFormEditEngine(string $uuid, string $redirectUrl): RedirectResponse|FormInterface;
 
     /**
      * @inheritdoc
@@ -32,5 +32,5 @@ interface SmartExportAdminInterface
     /**
      * @inheritdoc
      */
-    public function findByCode(string $code):SmartExportEngine;
+    public function findByUuid(string $uuid):SmartExportEngine;
 }

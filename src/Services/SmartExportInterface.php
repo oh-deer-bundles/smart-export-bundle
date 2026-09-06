@@ -13,18 +13,18 @@ use Odb\SmartExportBundle\Model\ExportSettings;
 interface SmartExportInterface
 {
     /**
-     * @param string $code
-     * @param string|null $filename if $filename is null the default will be YYYY-MM-DD-HH-II_{$code}.extension
+     * @param string $uuid
+     * @param string|null $filename if $filename is null the default will be YYYY-MM-DD-HH-II_{$uuid}.extension
      * @return mixed
      */
-    public function add(string $code, ?string $filename = null);
+    public function add(string $uuid, ?string $filename = null);
 
     /**
-     * @param string $code
-     * @param array $formOptions optional you can overwrite the form options except code_export
+     * @param string $uuid
+     * @param array $formOptions optional you can overwrite the form options except uuid_export
      * @return FormInterface
      */
-    public function createForm(string $code, array $formOptions = []): FormInterface;
+    public function createForm(string $uuid, array $formOptions = []): FormInterface;
 
     /**
      * true if form is valid
@@ -64,7 +64,7 @@ interface SmartExportInterface
     /**
      * @return null|string
      */
-    public function getCode(): ?string;
+    public function getUuid(): ?string;
 
     /**
      * @inheritdoc 
@@ -84,5 +84,5 @@ interface SmartExportInterface
     /**
      * @inheritdoc
      */
-    public function findByCode(string $code):SmartExportEngine;
+    public function findByUuid(string $uuid):SmartExportEngine;
 }

@@ -1,95 +1,92 @@
 {% extends '@OdbSmartExport/_layout.html.twig' %}
-{% form_theme formAddEngine 'bootstrap_5_layout.html.twig' %}
+{% form_theme formAddEngine '@OdbSmartExport/form/tailwind_layout.html.twig' %}
 {% block body %}
-    <div class="row">
-        <div class="col-12">
-            <h1 class="text-center">Index admin bundle</h1>
-        </div>
-        <div class="col-12">
-            <!-- Button trigger modal -->
-            <a href="{{ url('odb_smart_export_admin_data_structure',{'token':csrf_token('odb_smart_export_admin_data_structure')}) }}" class="btn btn-success me-3" >Download data structure</a>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addExport">New Export</button>
-
-            <!-- Modal -->
-            <div class="modal fade" id="addExport" tabindex="-1" aria-labelledby="addExportTitle" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        {{ form_start(formAddEngine) }}
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="addExportTitle">Add an export</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            {{ form_row(formAddEngine.code) }}
-                            {{ form_row(formAddEngine.description) }}
-                            {{ form_row(formAddEngine.className) }}
-
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-danger">Save</button>
-                        </div>
-                        {{ form_end(formAddEngine) }}
-                    </div>
-                </div>
+    <div data-controller="dialog">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Index admin bundle</h1>
+            <div class="flex gap-3">
+                <a href="{{ url('odb_smart_export_admin_data_structure',{'token':csrf_token('odb_smart_export_admin_data_structure')}) }}"
+                   class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-500">Download data structure</a>
+                <button type="button" data-action="click->dialog#open"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">New Export</button>
             </div>
         </div>
-        <div class="col-12">
-            {% if engines|length > 0 %}
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Code</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Related entity</th>
-                    <th scope="col">Enabled</th>
-                    <th scope="col">Created At</th>
-                    <th scope="col">Updated At</th>
-                    <th class="text-end" scope="col">Action</th>
-                </tr>
-                </thead>
-                <tbody>
-            {% for engine in engines %}
+
+        <dialog data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop"
+                class="w-full max-w-lg rounded-lg bg-white p-0 text-slate-900 shadow-xl backdrop:bg-slate-900/50 dark:bg-slate-900 dark:text-slate-100">
+            {{ form_start(formAddEngine) }}
+            <div class="border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+                <h2 class="text-lg font-semibold">Add an export</h2>
+            </div>
+            <div class="px-6 py-4">
+                {{ form_row(formAddEngine.name) }}
+                {{ form_row(formAddEngine.code) }}
+                {{ form_row(formAddEngine.description) }}
+                {{ form_row(formAddEngine.className) }}
+            </div>
+            <div class="flex justify-end gap-3 border-t border-slate-200 px-6 py-4 dark:border-slate-700">
+                <button type="button" data-action="click->dialog#close"
+                        class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700">Close</button>
+                <button type="submit"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">Save</button>
+            </div>
+            {{ form_end(formAddEngine) }}
+        </dialog>
+    </div>
+
+    <div data-controller="dialog">
+        {% if engines|length > 0 %}
+            <div class="overflow-x-auto rounded-lg ring-1 ring-slate-200 dark:ring-slate-700">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50">
                     <tr>
-                        <th scope="row">{{ engine.id }}</th>
-                        <td>{{ engine.code }}</td>
-                        <td>{{ engine.description }}</td>
-                        <td>{{ engine.className }}</td>
-                        <td>{{ engine.enabled ? 'Y' : 'N' }}</td>
-                        <td>{{ engine.createdAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
-                        <td>{{ engine.updatedAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
-                        <td class="text-end">
-{#                            <button type="button" data-bs-toggle="modal" data-bs-target="#confirmDelete" class="btn btn-danger me-3 btn-sm" data-url="{{ url('odb_smart_export_admin_remove', {'code':engine.code }) }}">Remove</button>#}
-                            <a href="{{ url('odb_smart_export_admin_demo_export', {'code':engine.code }) }}" class="btn btn-success me-3 btn-sm">Demo export</a>
-                            <a href="{{ url('odb_smart_export_admin_toggle', {'code':engine.code }) }}" class="btn btn-danger me-3 btn-sm">{{ engine.enabled ? 'Disable':'Enable' }}</a>
-                            <a href="{{ url('odb_smart_export_admin_edit', {'code':engine.code }) }}" class="btn btn-warning btn-sm">Edit</a>
-                        </td>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">#</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Name</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Code</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Description</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Related entity</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Enabled</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Created At</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Updated At</th>
+                        <th scope="col" class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Action</th>
                     </tr>
-            {% endfor %}
-                </tbody>
-            </table>
-                <div class="modal fade" id="confirmDelete" tabindex="-1" aria-labelledby="confirmDeleteTitle" aria-hidden="true">
-                    <div class="modal-dialog text-danger">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="confirmDeleteTitle">Remove export</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-danger">
-                                <div class="fs-3 mb-2">Attention !</div>
-                                <div>Are you sure to permanently remove an export ?</div>
-                            </div>
-                            <div class="modal-footer">
-                                <a href="#" class="btn btn-danger">Confirm delete</a>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-            <div class="text-center lead">You must set an export</div>
-            {% endif %}
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
+                    {% for engine in engines %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">{{ engine.id }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ engine.name }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ engine.code }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ engine.description }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ engine.className }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">{{ engine.enabled ? 'Y' : 'N' }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ engine.createdAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
+                            <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ engine.updatedAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
+                            <td class="px-4 py-3 text-right text-sm">
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ url('odb_smart_export_admin_demo_export', {'uuid':engine.uuid }) }}"
+                                       data-turbo-frame="demo-export-frame" data-action="click->dialog#open"
+                                       class="inline-flex items-center rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-500">Demo export</a>
+                                    <a href="{{ url('odb_smart_export_admin_toggle', {'uuid':engine.uuid }) }}"
+                                       class="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-500">{{ engine.enabled ? 'Disable':'Enable' }}</a>
+                                    <a href="{{ url('odb_smart_export_admin_edit', {'uuid':engine.uuid }) }}"
+                                       class="inline-flex items-center rounded-md bg-amber-500 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-amber-400">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <dialog data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop"
+                    class="w-full max-w-3xl rounded-lg bg-white p-6 text-slate-900 shadow-xl backdrop:bg-slate-900/50 dark:bg-slate-900 dark:text-slate-100">
+                <turbo-frame id="demo-export-frame" class="flex min-h-[12rem] items-center justify-center">
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Loading…</p>
+                </turbo-frame>
+            </dialog>
+        {% else %}
+            <p class="text-center text-lg text-slate-500 dark:text-slate-400">You must set an export</p>
+        {% endif %}
     </div>
 {% endblock %}

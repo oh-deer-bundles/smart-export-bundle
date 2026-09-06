@@ -5,6 +5,7 @@ namespace Odb\SmartExportBundle\Entity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Uid\UuidV7;
 
 
 class SmartExportEngine
@@ -13,6 +14,8 @@ class SmartExportEngine
      * @var int
      */
     private $id;
+
+    private UuidV7 $uuid;
 
     /**
      * @var DateTime
@@ -30,9 +33,14 @@ class SmartExportEngine
     private $enabled = 1;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $code;
+
+    /**
+     * @var string|null
+     */
+    private $name;
 
     /**
      * @var string
@@ -71,11 +79,17 @@ class SmartExportEngine
     public function __construct()
     {
         $this->columns = new ArrayCollection();
+        $this->uuid = new UuidV7();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUuid(): UuidV7
+    {
+        return $this->uuid;
     }
 
     public function getCreatedAt(): ?\DateTime
@@ -119,9 +133,21 @@ class SmartExportEngine
         return $this->code;
     }
 
-    public function setCode(string $code): self
+    public function setCode(?string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

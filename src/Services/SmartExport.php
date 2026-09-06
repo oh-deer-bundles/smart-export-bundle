@@ -43,7 +43,7 @@ class SmartExport implements SmartExportInterface
     private string $locale;
     private ?FormInterface $form = null;
     private ?array $rawData;
-    private ?string $code;
+    private ?string $uuid;
 
     private ExportSettings $exportSettings;
 
@@ -59,30 +59,33 @@ class SmartExport implements SmartExportInterface
         $this->locale = $requestStack->getCurrentRequest() ? $requestStack->getCurrentRequest()->getLocale() : 'en';
     }
 
-    public function add(string $code, ?string $filename = null): void
+    public function add(string $uuid, ?string $filename = null): void
     {
-        $this->createForm($code);
+        $this->createForm($uuid);
         if($filename) {
             $this->exportSettings->setFilename($filename);
         }
     }
 
     /**
-     * @param string $code
+     * @param string $uuid
      * @param array $formOptions
      * @return FormInterface
      */
-    public function createForm(string $code, array $formOptions = []): FormInterface
+    public function createForm(string $uuid, array $formOptions = []): FormInterface
     {
         if(!$this->form) {
+            $engine = $this->findByUuid($uuid);
+            $label = $engine->getName() ?: ($engine->getCode() ?: $uuid);
+
             $this->exportSettings = new ExportSettings();
-            $this->exportSettings->setCode($code);
-            $this->exportSettings->setFormattedCode(strtolower($this->slugger->slug($code)));
+            $this->exportSettings->setCode($label);
+            $this->exportSettings->setFormattedCode(strtolower($this->slugger->slug($label)));
             $this->exportSettings->setLocale($this->locale);
-            
-            $this->code = $code;
+
+            $this->uuid = $uuid;
             $formName = 'smart_export_'.$this->exportSettings->getFormattedCode();
-            $formOptions['code_export'] = $this->exportSettings->getCode();
+            $formOptions['uuid_export'] = $uuid;
             $this->form = $this->formFactory->createNamed($formName, SmartExportType::class, [], $formOptions);
         }
         return $this->form;
@@ -119,7 +122,7 @@ class SmartExport implements SmartExportInterface
     private function setDefinitions(): SmartExport
     {
         $fielsData = $this->form->get('fields')->getData();
-        $definitions = $this->smartExportChoice->parseChoices($this->code, $fielsData);
+        $definitions = $this->smartExportChoice->parseChoices($this->uuid, $fielsData);
         
         $this->exportSettings->setEngine($definitions['engine']);
         $this->exportSettings->setColumns($definitions['columns']);
@@ -169,9 +172,9 @@ class SmartExport implements SmartExportInterface
         return $this;
     }
 
-    public function getCode(): ?string
+    public function getUuid(): ?string
     {
-        return $this->code;
+        return $this->uuid;
     }
 
 

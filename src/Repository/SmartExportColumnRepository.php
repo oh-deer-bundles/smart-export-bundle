@@ -19,7 +19,7 @@ class SmartExportColumnRepository extends ServiceEntityRepository
         parent::__construct($registry, SmartExportColumn::class);
     }
 
-    public function getChoicesByEngineCode(string $engineCode) :array
+    public function getChoicesByEngineUuid(string $engineUuid) :array
     {
         $qb = $this->createQueryBuilder('sec')
             ->leftJoin('sec.engine', 'see')
@@ -29,22 +29,22 @@ class SmartExportColumnRepository extends ServiceEntityRepository
                 'sec.columnGroupIndex as columnGroup',
                 'sec.cellGroupIndex as cellGroup'
             )
-            ->where('see.code = :engineCode')
+            ->where('see.uuid = :engineUuid')
             ->andWhere('sec.enabled = 1')
-            ->setParameter('engineCode', $engineCode)
+            ->setParameter('engineUuid', $engineUuid, 'uuid')
             ->orderBy('sec.choicePosition', 'ASC')
             ->addOrderBy('sec.choiceLabel','ASC');
 
         return $qb->getQuery()->getArrayResult();
     }
 
-    public function getColumnsByEngineCode(string $engineCode)
+    public function getColumnsByEngineUuid(string $engineUuid)
     {
         $qb = $this->createQueryBuilder('sec')
             ->leftJoin('sec.engine', 'see')
-            ->where('see.code = :engineCode')
+            ->where('see.uuid = :engineUuid')
             ->andWhere('sec.enabled = 1')
-            ->setParameter('engineCode', $engineCode)
+            ->setParameter('engineUuid', $engineUuid, 'uuid')
             ->orderBy('sec.choicePosition', 'ASC')
             ->addOrderBy('sec.choiceLabel','ASC');
 
