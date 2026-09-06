@@ -1,0 +1,23 @@
+odb_smart_export_admin_index:
+    path: /admin/
+    controller: odb.smart-export.controller.admin::index
+
+odb_smart_export_admin_edit:
+    path: /admin/edit/{code}
+    controller: odb.smart-export.controller.admin::edit
+
+odb_smart_export_admin_toggle:
+    path: /admin/toggle/{code}
+    controller: odb.smart-export.controller.admin::toggle
+
+odb_smart_export_admin_remove:
+    path: /admin/remove/{code}
+    controller: odb.smart-export.controller.admin::toggle
+
+odb_smart_export_admin_data_structure:
+    path: /admin/data-structure/{token}
+    controller: odb.smart-export.controller.admin::getDataStructure
+
+odb_smart_export_admin_demo_export:
+    path: /admin/demo-export/{code}
+    controller: odb.smart-export.controller.admin::demoExport

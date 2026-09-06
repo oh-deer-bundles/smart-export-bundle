@@ -3,7 +3,7 @@
 namespace Odb\SmartExportBundle\Services;
 
 
-use Laminas\Code\Exception\InvalidArgumentException;
+use InvalidArgumentException;
 use RuntimeException;
 use Odb\SmartExportBundle\Entity\SmartExportColumn;
 use Odb\SmartExportBundle\Entity\SmartExportEngine;

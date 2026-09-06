@@ -1,0 +1,131 @@
+parameters:
+    # Main Public Class
+    odb.smart-export.export.class: Odb\SmartExportBundle\Services\SmartExport
+    # Admin Public Class
+    odb.smart-export.admin.class: Odb\SmartExportBundle\Services\SmartExportAdmin
+    # Repository
+    odb.smart-export.column.repository.class: Odb\SmartExportBundle\Repository\SmartExportColumnRepository
+    odb.smart-export.engine.repository.class: Odb\SmartExportBundle\Repository\SmartExportEngineRepository
+    # Choice Builder
+    # Query Builder
+    odb.smart-export.choice.class: Odb\SmartExportBundle\Services\SmartExportChoice
+    odb.smart-export.query.class: Odb\SmartExportBundle\Services\SmartExportQuery
+    # FormType
+    odb.smart-export.form.class: Odb\SmartExportBundle\Form\SmartExportType
+    odb.smart-export.admin.form.add.engine.class: Odb\SmartExportBundle\Form\Admin\SmartExportEngineType
+    odb.smart-export.admin.form.edit.engine.class: Odb\SmartExportBundle\Form\Admin\EditSmartExportEngineType
+    odb.smart-export.admin.form.column.class: Odb\SmartExportBundle\Form\Admin\SmartExportColumnType
+    # TEST
+    odb.smart-export.test.class: Odb\SmartExportBundle\Services\Test
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Main public class
+    odb.smart-export.export:
+        class: '%odb.smart-export.export.class%'
+        public: true
+        arguments:
+            - '@odb.smart-export.choice'
+            - '@odb.smart-export.query'
+            - '@odb.smart-export.engine.repository'
+            - '@request_stack'
+            - '@form.factory'
+            - '@slugger'
+
+    Odb\SmartExportBundle\Services\SmartExportInterface:
+        alias: odb.smart-export.export
+        public: true
+
+    # Admin public class
+    odb.smart-export.admin:
+        class: '%odb.smart-export.admin.class%'
+        public: true
+        arguments:
+            - '@request_stack'
+            - '@form.factory'
+            - '@odb.smart-export.engine.repository'
+            - '@odb.smart-export.column.repository'
+
+    Odb\SmartExportBundle\Services\SmartExportAdminInterface:
+        alias: odb.smart-export.admin
+        public: true
+
+    # Repository
+    odb.smart-export.engine.repository:
+        class: '%odb.smart-export.engine.repository.class%'
+        public: false
+        arguments:
+            - '@Doctrine\Persistence\ManagerRegistry'
+        tags:
+            - { name: doctrine.repository_service }
+
+    odb.smart-export.column.repository:
+        class: '%odb.smart-export.column.repository.class%'
+        public: false
+        arguments:
+            - '@Doctrine\Persistence\ManagerRegistry'
+        tags:
+            - { name: doctrine.repository_service }
+
+    # Choice Builder
+    # Query Builder
+    odb.smart-export.choice:
+        class: '%odb.smart-export.choice.class%'
+        public: true
+        arguments:
+            - '@odb.smart-export.engine.repository'
+            - '@odb.smart-export.column.repository'
+
+    Odb\SmartExportBundle\Services\SmartExportChoiceInterface:
+        alias: odb.smart-export.choice
+
+    odb.smart-export.query:
+        class: '%odb.smart-export.query.class%'
+        public: true
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    Odb\SmartExportBundle\Services\SmartExportQueryInterface:
+        alias: odb.smart-export.query
+
+    # FormType
+    odb.smart-export.form:
+        class: '%odb.smart-export.form.class%'
+        public: true
+        arguments:
+            - '@odb.smart-export.choice'
+        tags:
+            - { name: form.type }
+
+    odb.smart-export.admin.form.add.engine:
+        class: '%odb.smart-export.admin.form.add.engine.class%'
+        public: true
+        arguments:
+            - '@odb.smart-export.query'
+        tags:
+            - { name: form.type }
+
+    odb.smart-export.admin.form.edit.engine:
+        class: '%odb.smart-export.admin.form.edit.engine.class%'
+        public: true
+        arguments:
+            - '@odb.smart-export.query'
+        tags:
+            - { name: form.type }
+
+    odb.smart-export.admin.form.column:
+        class: '%odb.smart-export.admin.form.column.class%'
+        public: true
+        tags:
+            - { name: form.type }
+
+    odb.smart-export.controller.admin:
+        class: Odb\SmartExportBundle\Controller\AdminController
+        public: false
+        arguments:
+            - '@odb.smart-export.admin'
+            - '@odb.smart-export.export'

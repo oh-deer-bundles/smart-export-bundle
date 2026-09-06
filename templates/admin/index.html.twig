@@ -56,13 +56,13 @@
                         <td>{{ engine.code }}</td>
                         <td>{{ engine.description }}</td>
                         <td>{{ engine.className }}</td>
-                        <td>{{ engine.isActive ? 'Y' : 'N' }}</td>
+                        <td>{{ engine.enabled ? 'Y' : 'N' }}</td>
                         <td>{{ engine.createdAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
                         <td>{{ engine.updatedAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
                         <td class="text-end">
 {#                            <button type="button" data-bs-toggle="modal" data-bs-target="#confirmDelete" class="btn btn-danger me-3 btn-sm" data-url="{{ url('odb_smart_export_admin_remove', {'code':engine.code }) }}">Remove</button>#}
                             <a href="{{ url('odb_smart_export_admin_demo_export', {'code':engine.code }) }}" class="btn btn-success me-3 btn-sm">Demo export</a>
-                            <a href="{{ url('odb_smart_export_admin_toggle', {'code':engine.code }) }}" class="btn btn-danger me-3 btn-sm">{{ engine.isActive ? 'Disable':'Enable' }}</a>
+                            <a href="{{ url('odb_smart_export_admin_toggle', {'code':engine.code }) }}" class="btn btn-danger me-3 btn-sm">{{ engine.enabled ? 'Disable':'Enable' }}</a>
                             <a href="{{ url('odb_smart_export_admin_edit', {'code':engine.code }) }}" class="btn btn-warning btn-sm">Edit</a>
                         </td>
                     </tr>

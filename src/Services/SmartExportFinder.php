@@ -2,6 +2,7 @@
 
 namespace Odb\SmartExportBundle\Services;
 
+use InvalidArgumentException;
 use Odb\SmartExportBundle\Entity\SmartExportEngine;
 
 trait SmartExportFinder
