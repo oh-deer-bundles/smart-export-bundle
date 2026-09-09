@@ -134,32 +134,52 @@ tbl_smart_export:
 
 Le bundle peut restreindre les lignes retournées pour certaines entités à une liste d'ids autorisée, par utilisateur. **La restriction est une propriété de l'entité, pas de l'export** : elle s'applique partout où l'entité apparaît dans le graphe de jointures d'un export — qu'elle soit l'entité primaire ou une relation jointe (imbriquée ou non). Par exemple, si `Customer` est restreint, un export `Item -> Contract -> Customer` est filtré exactement comme le serait un export dont `Customer` est l'entité primaire.
 
-Le bundle ne **lit** que le cache — c'est l'application hôte qui écrit dedans, à sa convenance (listener de login, événement de changement de droits...). Aucune interface à implémenter : `AllowedIdsResolver::cacheKeyFor()` est le seul point de contrat, et il ne faut jamais reconstruire la clé à la main.
+**Entièrement géré côté bundle, à la demande (pull), jamais via un événement.** `AllowedIdsResolver` appelle lui-même, au besoin, un service hôte implémentant `AllowedIdsVoterInterface::getAllowedIds(string $className): array`, et met le résultat en cache **lui-même** pendant `security.allowed_ids_ttl` secondes (défaut 10 min). Il n'y a rien à brancher sur un listener de login/switch-user :
 
-Configuration :
+```php
+namespace Odb\SmartExportBundle\Services;
+
+interface AllowedIdsVoterInterface
+{
+    /** @return array<int, int|string> ids de $className autorisés pour l'utilisateur courant. */
+    public function getAllowedIds(string $className): array;
+}
+```
 
 ```yaml
-tbl_smart_export:
+odb_smart_export:
     security:
-        allowed_ids_cache_pool: cache.app   # pool PSR-6, défaut cache.app
+        allowed_ids_cache_pool: cache.app     # pool CacheInterface (get-or-compute), défaut cache.app
+        allowed_ids_ttl: 600                  # secondes, défaut 600 (10 min)
+        ids_voter: App\Services\Security\DataAccess\SmartExportSecurityManager
         restricted_entities:
             - App\Entity\Customer\Customer
 ```
 
-Écriture du cache côté application hôte (exemple dans un listener de login) :
-
 ```php
-use Odb\SmartExportBundle\Services\AllowedIdsResolver;
-use App\Entity\Customer\Customer;
+// App\Services\Security\DataAccess\SmartExportSecurityManager
+use Odb\SmartExportBundle\Services\AllowedIdsVoterInterface;
 
-$allowedCustomerIds = $accessManager->getAllowedCustomerIds($user); // logique métier hôte
-$key = AllowedIdsResolver::cacheKeyFor(Customer::class, $user->getUserIdentifier());
-$item = $cache->getItem($key);
-$item->set($allowedCustomerIds); // tableau d'ids (int|string)
-$cache->save($item);
+class SmartExportSecurityManager implements AllowedIdsVoterInterface
+{
+    public function getAllowedIds(string $className): array
+    {
+        if (Customer::class !== $className) {
+            return [];
+        }
+        // logique métier hôte — peut elle-même être mise en cache (ex. IdsAccessCache,
+        // 2h de TTL dans themis) sans que ça pose problème : AllowedIdsResolver
+        // met de toute façon son propre résultat en cache par-dessus.
+        return $this->idsAccessCache->getCustomerIdsAccess($this->security->getUser());
+    }
+}
 ```
 
-Comportement **fail closed** : si une entité est listée dans `restricted_entities` mais qu'aucune entrée n'existe en cache pour l'utilisateur courant (jamais écrite, ou expirée), l'export renvoie **zéro ligne** pour toute requête impliquant cette entité — jamais "pas de restriction". Une entité absente de `restricted_entities` n'est jamais filtrée, quel que soit le contenu du cache.
+**Ancien design (abandonné) :** le bundle ne faisait que *lire* un cache que l'application hôte devait *écrire* de son côté (typiquement depuis un listener `InteractiveLoginEvent`/`SwitchUserEvent`), via `AllowedIdsResolver::cacheKeyFor()`. Piège réel rencontré en production : toute authentification qui ne déclenche pas cet événement précis (reprise de session, un chemin d'authentification différent…) ne remplissait jamais l'entrée de cache — et comme une entrée manquante échoue **fermé** (zéro ligne, jamais "pas de restriction"), l'utilisateur perdait tout accès aux exports concernés sans raison apparente. Le nouveau design (pull + TTL court, entièrement dans le bundle) élimine cette classe de bug : `getAllowedIdsIfRestricted()` calcule lui-même la valeur au premier accès, quel que soit le chemin d'authentification emprunté.
+
+`AllowedIdsResolver::invalidate(string $entityClass, string $userIdentifier)` reste disponible pour invalider immédiatement le cache d'un utilisateur après un changement de droits (au lieu d'attendre l'expiration du TTL) — entièrement optionnel, la correctness n'en dépend jamais.
+
+Comportement **fail closed** inchangé : si une entité est listée dans `restricted_entities` mais que le voter renvoie un tableau vide (ou qu'aucun `security.ids_voter` n'a été configuré — défaut : un voter nul qui n'autorise jamais rien), l'export renvoie **zéro ligne** pour toute requête impliquant cette entité — jamais "pas de restriction". Une entité absente de `restricted_entities` n'est jamais filtrée.
 
 ⚠️ Piège YAML fréquent : `restricted_entities: ['App\Entity\Customer\Customer::class']` place le texte littéral `::class` dans la chaîne (YAML n'évalue pas la syntaxe PHP) — la comparaison stricte échoue silencieusement et la restriction ne s'applique jamais. Écrivez le FQCN nu : `['App\Entity\Customer\Customer']`.
 
@@ -175,4 +195,112 @@ Migration Doctrine nécessaire (colonnes `filterable` et `filter_default_value` 
 ALTER TABLE smart_export_column
   ADD filterable TINYINT DEFAULT 0 NOT NULL,
   ADD filter_default_value VARCHAR(255) DEFAULT NULL;
+```
+
+#### Popup d'export embarquable (`smart_export_popup()`) + colonnes/filtres configurables
+
+Le popup d'export (auparavant une page autonome du bundle, avec sa propre mise en page Tailwind/Turbo) est maintenant un **fragment injectable dans n'importe quelle page hôte**, via une unique fonction Twig :
+
+```twig
+{{ smart_export_popup(engine.uuid) }}
+{{ smart_export_popup(engine.uuid, 'Exporter les clients') }}
+```
+
+Cette fonction imprime un bouton déclencheur + une coquille de popup vide (aucun accès base de données) ; le contenu réel (colonnes, filtres, valeurs distinctes — tout ce qui nécessite la base) n'est chargé qu'au clic, via `fetch()` vers la route `odb_smart_export_admin_demo_export` existante. Le CSS/JS du popup (`public/css/popup.css`, `public/js/popup-app.js` + `public/js/vendor/stimulus.js` vendorisé) n'est imprimé qu'au **premier** appel de la fonction sur une même page — appeler `smart_export_popup()` une fois par ligne d'une liste ne duplique jamais les assets. Aucune configuration supplémentaire côté application hôte : `bin/console assets:install` (déjà nécessaire aujourd'hui) suffit.
+
+Le popup lui-même est un wizard à 3 étapes (Filtres → Colonnes → Format), dont l'étape Filtres disparaît entièrement s'il n'y a aucun filtre à afficher. Arriver sur l'étape Format déclenche automatiquement la vérification du nombre de lignes (route `/admin/count/{uuid}`) — il n'y a plus de bouton "Vérifier" séparé.
+
+Trois nouveaux réglages par colonne (`SmartExportColumn`), visibles dans l'admin d'édition d'un export à côté de `filterable` :
+
+- **`columnDisplay`** (défaut `true`) — la colonne est-elle offerte comme champ exportable dans le panneau Colonnes ? Indépendant de `filterable` : une colonne peut servir uniquement de filtre sans jamais être exportée.
+- **`selectedByDefault`** (défaut `false`) — si `columnDisplay=true`, la colonne démarre-t-elle cochée dans le panneau Colonnes ?
+- **`filterDisplay`** (défaut `true`) — si `filterable=true`, le widget de filtre est-il affiché dans le panneau Filtres, ou appliqué silencieusement (avec `filterDefaultValue`) sans jamais être montré à l'utilisateur ?
+
+Exemple concret — un export "clients actifs" qui filtre toujours sur `actif = oui`, sans jamais montrer ce filtre ni permettre d'exporter la colonne `actif` elle-même :
+
+```php
+$column->setFilterable(true);
+$column->setFilterDefaultValue('1');
+$column->setFilterDisplay(false);
+$column->setColumnDisplay(false);
+```
+
+⚠️ Si plusieurs colonnes sont fusionnées via `cellGroupIndex` (rendu en une seule cellule à l'export), évitez de mélanger `columnDisplay=true` et `columnDisplay=false` au sein d'un même groupe : le ou les membres masqués disparaissent silencieusement de la cellule fusionnée plutôt que de bloquer tout le groupe.
+
+Migration Doctrine nécessaire :
+
+```sql
+ALTER TABLE smart_export_column
+  ADD column_display TINYINT DEFAULT 1 NOT NULL,
+  ADD selected_by_default TINYINT DEFAULT 0 NOT NULL,
+  ADD filter_display TINYINT DEFAULT 1 NOT NULL;
+```
+
+#### Simplification des labels de colonne et suppression de `columnGroupIndex`
+
+`SmartExportColumn` n'a plus qu'un seul champ de libellé, `label` (auparavant deux : `choiceLabel`, montré dans le formulaire d'export, et `headerLabel`, utilisé comme entête du fichier généré — les deux étaient en pratique toujours identiques). `getChoiceLabel()`/`setChoiceLabel()` deviennent `getLabel()`/`setLabel()` ; `getHeaderLabel()`/`setHeaderLabel()` disparaissent — l'entête du fichier généré utilise désormais `label`.
+
+Le champ `columnGroupIndex` (fusion de colonnes, distinct de `cellGroupIndex` qui fusionne des *cellules* et reste inchangé) est supprimé : son chemin de code dans `SmartExportChoice::parseChoices()` portait d'ailleurs un commentaire `// todo not working` — il n'a jamais fonctionné correctement et n'est utilisé nulle part côté admin.
+
+#### `smart_export_popup()` : lien `<a>`, label HTML, classe personnalisée, `detailed` et `id`
+
+Le déclencheur imprimé par `smart_export_popup()` est maintenant un `<a href="#">` (auparavant un `<button>`), pour s'intégrer naturellement dans n'importe quelle mise en page hôte (colonne d'actions d'un tableau, barre d'outils…). Trois nouvelles options :
+
+```twig
+{{ smart_export_popup(
+    customer.uuid,
+    '<i class="fa fa-download me-3"></i>Télécharger',
+    {'class': 'btn btn-sm btn-success', 'detailed': true, 'id': customer.id}
+) }}
+```
+
+- **Le label accepte du HTML** (rendu `|raw` — c'est du Twig écrit par le développeur appelant la fonction dans son propre template, jamais une saisie utilisateur), pour par exemple préfixer un texte d'une icône.
+- **Le lien est volontairement sans style** : `popup.css` ne porte plus aucune règle pour `smart-export-trigger` (seule classe systématiquement présente sur le `<a>`, en tant que simple hook — JS, CSS hôte… — jamais pour imposer une apparence). C'est à l'appelant de styler le lien lui-même via **`class`** (ajoutée à côté de `smart-export-trigger`, jamais à sa place — rien dans le bundle ne vient donc jamais entrer en conflit avec des classes d'un framework CSS de l'app hôte comme Bootstrap).
+- **`detailed`** (bool, défaut `true`) — l'étape Colonnes reste toujours affichée ; à `false`, chaque tuile de colonne montre uniquement son libellé, sans le nom technique (`classProperty`) affiché en dessous — un sélecteur plus simple, moins technique, pour un public non-administrateur.
+- **`id`** (`int|string|array`) — restreint l'export à cet id, ou ce tableau d'ids, de l'entité primaire de l'export (ex. un seul client, ou les ids des articles d'un contrat). S'ajoute aux restrictions existantes sans jamais les contourner : si l'entité primaire est configurée dans `security.restricted_entities`, la restriction par ids autorisés (`AllowedIdsResolver`) continue de s'appliquer en plus — un appelant ne peut jamais exporter un id auquel il n'a pas accès simplement en le passant dans cette option.
+
+Aucune migration Doctrine requise pour ce changement (uniquement des ajouts côté Twig/formulaire/requête).
+
+#### Export / import JSON d'un export (page d'édition)
+
+Le bouton **Exporter** de la page d'édition télécharge un snapshot JSON minimal (`header` + `columns`) d'un export — pensé pour être versionné, sauvegardé, ou rejoué sur une autre instance (ex. dev -> recette). Le bouton **Importer** de la liste (`/admin/import`) reprend un tel fichier :
+
+```json
+{
+    "formatVersion": 1,
+    "exportedAt": "2026-09-09T15:22:06+02:00",
+    "header": {
+        "uuid": "01a07620-7a5a-7f08-af0c-b75ffab2ce82",
+        "code": "customer_active",
+        "name": "Export clients actifs",
+        "description": "...",
+        "className": "App\\Entity\\Customer\\Customer",
+        "enabled": true
+    },
+    "columns": [
+        {"choicePosition": 0, "classProperty": "active", "label": "Actif", "cellGroupIndex": null,
+         "interpreter": "boolean", "enabled": true, "columnDisplay": false, "selectedByDefault": false,
+         "filterable": true, "filterDisplay": false, "filterDefaultValue": "true", "filterWidget": "auto"}
+    ]
+}
+```
+
+**L'import n'écrit jamais rien en un seul clic** — trois étapes toujours distinctes (`SmartExportEngineTransfer`) :
+1. `parseImport()` — parsing/validation pures (plus une lecture, jamais une écriture : recherche d'un export existant portant le même `uuid`). Erreurs bloquantes (JSON invalide, `header`/`columns` manquant, `className`/`classProperty` absent) vs avertissements non bloquants (classe introuvable dans l'appli courante, `uuid` invalide et donc ignoré).
+2. L'écran de confirmation affiche le résultat du parsing — jamais un accès direct en base — et réembarque le JSON dans un champ caché (`import_json`) pour l'étape suivante.
+3. Seule la confirmation explicite (`odb_smart_export_admin_import_commit`) déclenche `commitImport()` : ré-analyse le **même** JSON (jamais une confiance aveugle dans ce qui a été confirmé) et, si toujours valide, persiste.
+
+**Correspondance création/mise à jour** : uniquement par `uuid` (jamais par `code`). Si l'`uuid` du fichier correspond à un export déjà présent sur cette instance → **mise à jour** (son `uuid` ne bouge pas, ses colonnes sont intégralement remplacées par celles du fichier — un remplacement de snapshot, jamais une fusion/diff). Sinon → **création**, avec le **même** `uuid` que le fichier (`SmartExportEngine::setUuid()`, nouveau — n'existe que pour ce cas précis) si valide, ou un `uuid` généré sinon. Effet recherché : promouvoir un export de dev vers recette, puis le réimporter après modification, retombe systématiquement en mode mise à jour du même export — et tout code hôte référençant déjà `smart_export_popup(uuid)` continue de fonctionner après la promotion, sans avoir à traquer un nouvel uuid.
+
+⚠️ Deux bugs latents corrigés à cette occasion dans `SmartExportColumn`/`SmartExportEngine` — jamais déclenchés par les parcours existants (édition d'exports déjà en base), mais systématiquement par la création d'entités entièrement neuves (import en mode création) :
+- `SmartExportColumn::$filterable` n'avait aucun type PHP déclaré ; Doctrine ne pouvait donc pas en déduire le type de colonne et le traitait comme une chaîne, transformant silencieusement `false` en `''` (chaîne vide) — rejeté par la colonne SQL réellement entière. Corrigé en `private bool $filterable = false;`, aucune migration nécessaire (le schéma SQL était déjà correct, seul le mapping PHP était erroné).
+- `SmartExportEngine::$createdAt`/`$updatedAt` sont des propriétés typées non-nullables sans valeur par défaut ; `updateDate()` (le listener `PrePersist`) suppose pourtant pouvoir lire `getCreatedAt() === null` avant le tout premier persist, ce qui lève une `Error` PHP ("must not be accessed before initialization") au lieu de renvoyer `null`. Corrigé en initialisant les deux dans le constructeur, au même endroit où `$uuid` l'est déjà.
+
+Migration Doctrine nécessaire (`CHANGE`, pas `DROP`+`ADD`, pour préserver les valeurs existantes de `choice_label`) :
+
+```sql
+ALTER TABLE smart_export_column
+  CHANGE choice_label label VARCHAR(128) DEFAULT NULL,
+  DROP header_label,
+  DROP column_group_index;
 ```
