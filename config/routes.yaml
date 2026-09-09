@@ -21,3 +21,8 @@ odb_smart_export_admin_data_structure:
 odb_smart_export_admin_demo_export:
     path: /admin/demo-export/{uuid}
     controller: odb.smart-export.controller.admin::demoExport
+
+odb_smart_export_admin_count:
+    path: /admin/count/{uuid}
+    controller: odb.smart-export.controller.admin::count
+    methods: [POST]

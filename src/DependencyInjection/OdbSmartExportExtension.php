@@ -22,10 +22,12 @@ class OdbSmartExportExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.yaml');
 
-
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
+        $container->setParameter('odb_smart_export.max_rows', $config['max_rows']);
+        $container->setAlias('odb.smart-export.allowed_ids_cache', $config['security']['allowed_ids_cache_pool']);
+        $container->setParameter('odb_smart_export.security.restricted_entities', $config['security']['restricted_entities']);
     }
 
 }

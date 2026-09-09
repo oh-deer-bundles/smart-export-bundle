@@ -39,6 +39,9 @@
                         <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Export label</th>
                         <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Group Cell</th>
                         <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Interpreter</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Filterable</th>
+                        <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Filter widget</th>
+                        <th class="min-w-[8rem] px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Default filter value</th>
                         <th class="w-12"></th>
                     </tr>
                     </thead>
@@ -126,6 +129,24 @@
             {{ form_widget(formColumn.interpreter) }}
             {% if whitHelper %}
                 {{ form_help(formColumn.interpreter) }}
+            {% endif %}
+        </td>
+        <td class="px-2 py-2 align-top text-center">
+            {{ form_widget(formColumn.filterable) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.filterable) }}
+            {% endif %}
+        </td>
+        <td class="px-2 py-2 align-top">
+            {{ form_widget(formColumn.filterWidget) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.filterWidget) }}
+            {% endif %}
+        </td>
+        <td class="px-2 py-2 align-top">
+            {{ form_widget(formColumn.filterDefaultValue) }}
+            {% if whitHelper %}
+                {{ form_help(formColumn.filterDefaultValue) }}
             {% endif %}
         </td>
         <td class="px-2 py-2 align-top text-right">

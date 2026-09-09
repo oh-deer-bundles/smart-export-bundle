@@ -13,7 +13,8 @@ class SmartExportChoice implements SmartExportChoiceInterface
 
     public function __construct(
         private readonly SmartExportEngineRepository $exportEngineRepository,
-        private readonly SmartExportColumnRepository $exportColumnRepository
+        private readonly SmartExportColumnRepository $exportColumnRepository,
+        private readonly SmartExportQueryInterface $exportQuery
     ) {
     }
 
@@ -103,6 +104,45 @@ class SmartExportChoice implements SmartExportChoiceInterface
             if(array_key_exists($key, $columns)) {
                $response['columns'][$key] = $columns[$key];
             }
+        }
+
+        return $response;
+    }
+
+    public function getFilterableColumns(string $engineUuid): array
+    {
+        return $this->exportColumnRepository->getFilterableColumnsByEngineUuid($engineUuid);
+    }
+
+    public function getDistinctValuesForColumn(SmartExportColumn $column): array
+    {
+        if (!$column->getEngine()) {
+            return [];
+        }
+
+        return $this->exportQuery->getDistinctValues($column->getEngine(), $column);
+    }
+
+    public function resolveFilters(string $engineUuid, array $rawFilters): array
+    {
+        $response = [];
+        foreach ($rawFilters as $columnId => $rawFilter) {
+            $column = $this->exportColumnRepository->find($columnId);
+            if (
+                !$column instanceof SmartExportColumn
+                || !$column->isFilterable()
+                || !$column->getEngine()
+                || $column->getEngine()->getUuid()?->toRfc4122() !== $engineUuid
+            ) {
+                continue;
+            }
+
+            $response[] = [
+                'column' => $column,
+                'operator' => $rawFilter['operator'],
+                'value' => $rawFilter['value'] ?? null,
+                'value2' => $rawFilter['value2'] ?? null,
+            ];
         }
 
         return $response;

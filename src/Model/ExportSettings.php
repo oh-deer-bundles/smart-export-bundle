@@ -11,6 +11,11 @@ class ExportSettings
 
     private array $columns = [];
 
+    /**
+     * @var array<int, array{column: \Odb\SmartExportBundle\Entity\SmartExportColumn, operator: string, value: mixed, value2: mixed}>
+     */
+    private array $filters = [];
+
     private string $code;
 
     private ?string $formattedCode = null;
@@ -51,6 +56,17 @@ class ExportSettings
     public function setColumns(array $columns): static
     {
         $this->columns = $columns;
+        return $this;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function setFilters(array $filters): static
+    {
+        $this->filters = $filters;
         return $this;
     }
 

@@ -79,15 +79,25 @@ services:
         arguments:
             - '@odb.smart-export.engine.repository'
             - '@odb.smart-export.column.repository'
+            - '@odb.smart-export.query'
 
     Odb\SmartExportBundle\Services\SmartExportChoiceInterface:
         alias: odb.smart-export.choice
+
+    odb.smart-export.allowed_ids_resolver:
+        class: Odb\SmartExportBundle\Services\AllowedIdsResolver
+        public: false
+        arguments:
+            - '@odb.smart-export.allowed_ids_cache'
+            - '@Symfony\Bundle\SecurityBundle\Security'
+            - '%odb_smart_export.security.restricted_entities%'
 
     odb.smart-export.query:
         class: '%odb.smart-export.query.class%'
         public: true
         arguments:
             - '@doctrine.orm.entity_manager'
+            - '@odb.smart-export.allowed_ids_resolver'
 
     Odb\SmartExportBundle\Services\SmartExportQueryInterface:
         alias: odb.smart-export.query
@@ -129,3 +139,4 @@ services:
         arguments:
             - '@odb.smart-export.admin'
             - '@odb.smart-export.export'
+            - '%odb_smart_export.max_rows%'

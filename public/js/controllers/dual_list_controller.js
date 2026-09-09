@@ -96,5 +96,7 @@ export default class extends Controller {
 
         const values = chosenItems.map(item => parseInt(item.dataset.value, 10))
         this.inputTarget.value = values.length > 0 ? JSON.stringify(values) : ''
+
+        this.element.dispatchEvent(new CustomEvent('dual-list:change', { bubbles: true }))
     }
 }

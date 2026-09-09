@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,7 @@ class AdminController extends AbstractController
     public function __construct(
         private readonly SmartExportAdminInterface $smartExportAdmin,
         private readonly SmartExportInterface $smartExport,
+        private readonly int $maxRows,
     ){
     }
 
@@ -225,6 +227,18 @@ class AdminController extends AbstractController
         return $this->render('@OdbSmartExport/admin/demo.html.twig', [
             'formExport' => $formExport,
             'uuid' => $uuid
+        ]);
+    }
+
+    public function count(string $uuid): JsonResponse
+    {
+        $this->smartExport->createForm($uuid);
+        $count = $this->smartExport->count();
+
+        return new JsonResponse([
+            'count' => $count,
+            'maxRows' => $this->maxRows,
+            'allowed' => $count <= $this->maxRows,
         ]);
     }
 }

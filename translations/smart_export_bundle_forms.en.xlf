@@ -138,6 +138,114 @@
                 <source>seb.class_property.helper</source>
                 <target>File like as define in the entity, eg. in case of relation write it like twig: addresses.city</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>seb.filterable.label</source>
+                <target>Filterable</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>seb.filterable.helper</source>
+                <target>Shows a filter for this column in the export popup</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>seb.filter_default_value.label</source>
+                <target>Default filter value</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>seb.filter_default_value.helper</source>
+                <target>Prefills the filter until the user has filtered this export at least once</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>seb.filter.operator.none</source>
+                <target>-- no filter --</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>seb.filter.operator.contains</source>
+                <target>contains</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>seb.filter.operator.not_contains</source>
+                <target>does not contain</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>seb.filter.operator.starts_with</source>
+                <target>starts with</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>seb.filter.operator.ends_with</source>
+                <target>ends with</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>seb.filter.operator.equal</source>
+                <target>equal to</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>seb.filter.operator.gt</source>
+                <target>greater than</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>seb.filter.operator.gte</source>
+                <target>greater than or equal to</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>seb.filter.operator.lt</source>
+                <target>less than</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>seb.filter.operator.lte</source>
+                <target>less than or equal to</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>seb.filter.operator.between</source>
+                <target>between</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>seb.filter.operator.before</source>
+                <target>before</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>seb.filter.operator.after</source>
+                <target>after</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>seb.filter.boolean.yes</source>
+                <target>Yes</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>seb.filter.boolean.no</source>
+                <target>No</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>seb.filter_widget.label</source>
+                <target>Filter type</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>seb.filter_widget.helper</source>
+                <target>"select" offers every distinct value that currently exists instead of a free-text field</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>seb.filter_widget.auto</source>
+                <target>Automatic (based on the interpreter)</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>seb.filter_widget.select</source>
+                <target>List of existing values (multiple choice)</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>seb.filter_widget.single_select</source>
+                <target>List of existing values (single choice)</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>seb.filter.operator.in</source>
+                <target>is one of</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>seb.filter.operator.not_in</source>
+                <target>is none of</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>seb.filter.boolean.unfiltered</source>
+                <target>Not filtered</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

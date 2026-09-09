@@ -115,3 +115,64 @@ Configuration du bundle :
    - `down()` échouera si des lignes ont un `code` à `NULL` au moment du rollback : c'est un choix assumé (on ne devine pas quoi remettre à la place).
 
 5. **Vérifier** : `bin/console cache:clear`, `bin/console doctrine:schema:validate`, puis un tour dans l'admin (`/smart-export/admin/` par défaut) pour confirmer que les exports existants sont bien listés avec leur uuid et que les actions (edit/toggle/remove/demo-export) fonctionnent.
+
+### Nouvelles fonctionnalités (non cassantes, aucune migration requise)
+
+#### Limite de lignes (`max_rows`)
+
+Un export ne peut plus être généré au-delà d'un certain nombre de lignes réellement produites (le comptage tient compte du fan-out des relations to-many jointes, pas uniquement des entités primaires distinctes). Un bouton "Vérifier" dans le popup d'export interroge `/admin/count/{uuid}` et débloque "Generate" seulement si le résultat est dans la limite.
+
+Configuration (optionnelle, valeur par défaut `20000`) :
+
+```yaml
+# config/packages/odb_smart_export.yaml (ou tbl_smart_export.yaml selon le nom retenu côté hôte)
+tbl_smart_export:
+    max_rows: 20000
+```
+
+#### Sécurité : restriction par ids autorisés (`security.restricted_entities`)
+
+Le bundle peut restreindre les lignes retournées pour certaines entités à une liste d'ids autorisée, par utilisateur. **La restriction est une propriété de l'entité, pas de l'export** : elle s'applique partout où l'entité apparaît dans le graphe de jointures d'un export — qu'elle soit l'entité primaire ou une relation jointe (imbriquée ou non). Par exemple, si `Customer` est restreint, un export `Item -> Contract -> Customer` est filtré exactement comme le serait un export dont `Customer` est l'entité primaire.
+
+Le bundle ne **lit** que le cache — c'est l'application hôte qui écrit dedans, à sa convenance (listener de login, événement de changement de droits...). Aucune interface à implémenter : `AllowedIdsResolver::cacheKeyFor()` est le seul point de contrat, et il ne faut jamais reconstruire la clé à la main.
+
+Configuration :
+
+```yaml
+tbl_smart_export:
+    security:
+        allowed_ids_cache_pool: cache.app   # pool PSR-6, défaut cache.app
+        restricted_entities:
+            - App\Entity\Customer\Customer
+```
+
+Écriture du cache côté application hôte (exemple dans un listener de login) :
+
+```php
+use Odb\SmartExportBundle\Services\AllowedIdsResolver;
+use App\Entity\Customer\Customer;
+
+$allowedCustomerIds = $accessManager->getAllowedCustomerIds($user); // logique métier hôte
+$key = AllowedIdsResolver::cacheKeyFor(Customer::class, $user->getUserIdentifier());
+$item = $cache->getItem($key);
+$item->set($allowedCustomerIds); // tableau d'ids (int|string)
+$cache->save($item);
+```
+
+Comportement **fail closed** : si une entité est listée dans `restricted_entities` mais qu'aucune entrée n'existe en cache pour l'utilisateur courant (jamais écrite, ou expirée), l'export renvoie **zéro ligne** pour toute requête impliquant cette entité — jamais "pas de restriction". Une entité absente de `restricted_entities` n'est jamais filtrée, quel que soit le contenu du cache.
+
+⚠️ Piège YAML fréquent : `restricted_entities: ['App\Entity\Customer\Customer::class']` place le texte littéral `::class` dans la chaîne (YAML n'évalue pas la syntaxe PHP) — la comparaison stricte échoue silencieusement et la restriction ne s'applique jamais. Écrivez le FQCN nu : `['App\Entity\Customer\Customer']`.
+
+#### Filtrage avancé par colonne (`filterable`)
+
+Chaque colonne (`SmartExportColumn`) peut désormais être marquée `filterable` dans l'admin, avec une `filterDefaultValue` optionnelle. Le popup d'export affiche alors une ligne de filtre par colonne filtrable : un sélecteur d'opérateur (dépendant de l'`interpreter` de la colonne, voir `SmartExportFilterOperators`) et une ou deux valeurs. Les valeurs soumises sont persistées côté client dans un cookie `smart_export_filter_{uuid}` (30 jours), relues à la réouverture du popup — la `filterDefaultValue` ne s'applique que tant qu'aucun cookie n'existe.
+
+Un filtre peut porter sur une relation jointe (pas seulement l'entité primaire) : la résolution du chemin réutilise exactement la même logique de jointure que les colonnes exportées, donc un filtre sur `contract.customer.name` fonctionne quel que soit l'endroit de l'export où `Customer` est atteint.
+
+Migration Doctrine nécessaire (colonnes `filterable` et `filter_default_value` sur `smart_export_column`, valeurs par défaut littérales, pas de backfill) :
+
+```sql
+ALTER TABLE smart_export_column
+  ADD filterable TINYINT DEFAULT 0 NOT NULL,
+  ADD filter_default_value VARCHAR(255) DEFAULT NULL;
+```

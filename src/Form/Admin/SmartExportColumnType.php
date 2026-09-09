@@ -5,9 +5,12 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Odb\SmartExportBundle\Entity\SmartExportColumn;
+use Odb\SmartExportBundle\Enum\FilterWidget;
 use Odb\SmartExportBundle\Services\SmartExportQueryInterface;
 
 class SmartExportColumnType extends AbstractType
@@ -65,8 +68,28 @@ class SmartExportColumnType extends AbstractType
                 'label' => 'seb.class_property.label',
                 'help' => 'seb.class_property.helper'
             ])
-        
-        ; 
+
+            ->add('filterable', CheckboxType::class, [
+                'label' => 'seb.filterable.label',
+                'help' => 'seb.filterable.helper',
+                'required' => false,
+            ])
+
+            ->add('filterDefaultValue', TextType::class, [
+                'label' => 'seb.filter_default_value.label',
+                'help' => 'seb.filter_default_value.helper',
+                'required' => false,
+            ])
+
+            ->add('filterWidget', EnumType::class, [
+                'label' => 'seb.filter_widget.label',
+                'help' => 'seb.filter_widget.helper',
+                'class' => FilterWidget::class,
+                'choice_label' => fn (FilterWidget $widget) => 'seb.filter_widget.'.$widget->value,
+                'required' => false,
+            ])
+
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

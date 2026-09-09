@@ -96,9 +96,25 @@ class SmartExport implements SmartExportInterface
         $this->form->handleRequest($this->request);
         if($this->form->isSubmitted() && $this->form->isValid()) {
             $this->setDefinitions()->setRawData();
-            
+
         }
         return $this->exportSettings->getIsValid();
+    }
+
+    /**
+     * Counts how many rows the current form submission would export, without
+     * fetching them, so the admin can check the size before generating a
+     * potentially huge export.
+     */
+    public function count(): int
+    {
+        $this->form->handleRequest($this->request);
+        if($this->form->isSubmitted() && $this->form->isValid()) {
+            $this->setDefinitions();
+            return $this->smartExportQuery->countDataFromExportSettings($this->exportSettings);
+        }
+
+        return 0;
     }
 
 
@@ -123,9 +139,10 @@ class SmartExport implements SmartExportInterface
     {
         $fielsData = $this->form->get('fields')->getData();
         $definitions = $this->smartExportChoice->parseChoices($this->uuid, $fielsData);
-        
+
         $this->exportSettings->setEngine($definitions['engine']);
         $this->exportSettings->setColumns($definitions['columns']);
+        $this->exportSettings->setFilters($this->smartExportChoice->resolveFilters($this->uuid, $this->getRawSubmittedFilters()));
         $this->exportSettings->setFileFormat($this->form->get('file_format')->getData());
         $this->exportSettings->setCharset($this->form->get('charset')->getData());
         $this->exportSettings->setSeparator($this->form->get('separator')->getData());
@@ -136,6 +153,34 @@ class SmartExport implements SmartExportInterface
         }
         
         return $this;
+    }
+
+    /**
+     * Reads the submitted "filters" sub-form (dynamically built in
+     * SmartExportType::onPostSetData(), one child per filterable column, named
+     * "col_<columnId>") into the shape SmartExportChoice::resolveFilters()
+     * expects. A filter with no operator selected means "not applied" and is
+     * skipped, so an untouched filter row never restricts the export.
+     * @return array<int, array{operator: string, value: mixed, value2: mixed}>
+     */
+    private function getRawSubmittedFilters(): array
+    {
+        $filters = [];
+        foreach ($this->form->get('filters')->all() as $name => $filterForm) {
+            $operator = $filterForm->get('operator')->getData();
+            if (null === $operator || '' === $operator) {
+                continue;
+            }
+
+            $columnId = (int) substr($name, strlen('col_'));
+            $filters[$columnId] = [
+                'operator' => $operator,
+                'value' => $filterForm->get('value')->getData(),
+                'value2' => $filterForm->get('value2')->getData(),
+            ];
+        }
+
+        return $filters;
     }
 
     private function setRawData(): void

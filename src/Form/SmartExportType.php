@@ -4,15 +4,15 @@ namespace Odb\SmartExportBundle\Form;
 
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Odb\SmartExportBundle\Enum\FilterWidget;
 use Odb\SmartExportBundle\Services\SmartExport;
-use Odb\SmartExportBundle\Services\SmartExportChoice;
 use Odb\SmartExportBundle\Services\SmartExportChoiceInterface;
 
 class SmartExportType extends AbstractType
@@ -24,12 +24,10 @@ class SmartExportType extends AbstractType
     
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        //$options['columns'] = $this->getFieldChoices($options['uuid_export']);
         $builder
             ->add('file_format', ChoiceType::class, array(
                 'required'  => true,
                 'label'     => 'seb.file_format.label',
-//                'mapped'    => false,
                 'choices'   => array(
                     'seb.file_format.excel' => SmartExport::FORMAT_EXCEL_XLSX,
                     'seb.file_format.csv' => SmartExport::FORMAT_CSV,
@@ -39,7 +37,6 @@ class SmartExportType extends AbstractType
             ->add('separator', ChoiceType::class, array(
                 'required'  => true,
                 'label'     => 'seb.separator.label',
-//                'mapped'    => false,
                 'choices'   => array(
                     'seb.separator.semicolon' => SmartExport::SEPARATOR_SEMICOLON,
                     'seb.separator.comma' => SmartExport::SEPARATOR_COMMA,
@@ -50,7 +47,6 @@ class SmartExportType extends AbstractType
             ->add('charset', ChoiceType::class, array(
                 'required'  => true,
                 'label'     => 'seb.charset.label',
-//                'mapped'    => false,
                 'choices'   => array(
                     'seb.charset.windows' => SmartExport::CHARSET_CP1252,
                     'seb.charset.mac' => SmartExport::CHARSET_MACINTOSH,
@@ -61,6 +57,11 @@ class SmartExportType extends AbstractType
                 'required'  => true,
                 'attr' => ['class' => 'smart_export_fields']
             ))
+            ->add('filters', FormType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => false,
+            ])
             ->addEventListener(FormEvents::POST_SET_DATA, [$this,'onPostSetData'])
         ;
     }
@@ -79,13 +80,26 @@ class SmartExportType extends AbstractType
         $form = $event->getForm();
         $uuid_export = $event->getForm()->getConfig()->getOption('uuid_export');
         if($uuid_export) {
-            $choices =
             $form->add('choices', ChoiceType::class, [
                 'choices' =>  $this->exportChoice->getChoices($uuid_export),
                 'label'     => null,
                 'required'    => false,
                 'mapped'    => false,
             ]);
+
+            $filtersForm = $form->get('filters');
+            foreach ($this->exportChoice->getFilterableColumns($uuid_export) as $column) {
+                $filterOptions = [
+                    'interpreter' => $column->getInterpreter(),
+                    'default_value' => $column->getFilterDefaultValue(),
+                    'label' => $column->getChoiceLabel() ?: $column->getHeaderLabel(),
+                    'filter_widget' => $column->getFilterWidget(),
+                ];
+                if (in_array($column->getFilterWidget(), [FilterWidget::Select, FilterWidget::SingleSelect], true)) {
+                    $filterOptions['choices'] = $this->exportChoice->getDistinctValuesForColumn($column);
+                }
+                $filtersForm->add('col_'.$column->getId(), SmartExportFilterType::class, $filterOptions);
+            }
         }
     }
 }

@@ -5,62 +5,78 @@ namespace Odb\SmartExportBundle\Entity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Odb\SmartExportBundle\Repository\SmartExportEngineRepository;
 use Symfony\Component\Uid\UuidV7;
 
-
+#[ORM\Entity(repositoryClass: SmartExportEngineRepository::class)]
+#[ORM\Table(name: 'smart_export_engine')]
+#[ORM\HasLifecycleCallbacks]
 class SmartExportEngine
 {
-    /**
-     * @var int
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
+    #[ORM\Column(type: 'uuid', unique: true)]
     private UuidV7 $uuid;
 
     /**
      * @var DateTime
      */
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
     private $createdAt;
 
     /**
      * @var DateTime
      */
+    #[ORM\Column(name: 'updated_at', type: 'datetime')]
     private $updatedAt;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $enabled = 1;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 16, nullable: true)]
     private $code;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $name;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'class_name', type: 'string', length: 128)]
     private $className;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $description;
 
     /**
      * @var Collection
      */
+    #[ORM\OneToMany(mappedBy: 'engine', targetEntity: SmartExportColumn::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['choicePosition' => 'ASC'])]
     private $columns;
 
     /** ------------------------------------------------------------------------------------------------------------- */
     /**                                        OWN LOGIC                                                              */
     /** ------------------------------------------------------------------------------------------------------------- */
 
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function updateDate(): void
     {
         $now = new \DateTime('now');
@@ -174,11 +190,11 @@ class SmartExportEngine
     public function setDescription(?string $description): self
     {
         $this->description = $description;
-        
+
         return $this;
     }
-    
-    
+
+
 
     /**
      * @return Collection|SmartExportColumn[]

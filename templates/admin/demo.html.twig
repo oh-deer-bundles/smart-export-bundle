@@ -2,9 +2,14 @@
 {% form_theme formExport '@OdbSmartExport/form/tailwind_layout.html.twig' %}
 {% block body %}
     <turbo-frame id="demo-export-frame" class="block w-full">
-        <div data-controller="dual-list" class="w-full space-y-6">
+        <div data-controller="dual-list count filter"
+             data-count-url-value="{{ url('odb_smart_export_admin_count', {'uuid': uuid}) }}"
+             data-filter-uuid-value="{{ uuid }}"
+             data-action="dual-list:change->count#invalidate"
+             class="w-full space-y-6">
             {{ form_start(formExport, {'attr': {
                 'data-turbo': 'false',
+                'data-action': 'submit->filter#persist',
                 'action': url('odb_smart_export_admin_demo_export',{'uuid':uuid,'token': csrf_token('export_generate')}),
             }}) }}
 
@@ -38,13 +43,35 @@
 
             {{ form_widget(formExport.fields, {'attr': {'data-dual-list-target': 'input'}}) }}
 
+            {% if formExport.filters|length > 0 %}
+                <div class="rounded-md border border-slate-200 p-4 dark:border-slate-700"
+                     data-action="input->count#invalidate change->count#invalidate">
+                    <h3 class="mb-3 text-sm font-semibold text-slate-900 dark:text-white">Filtres</h3>
+                    <div class="space-y-3">
+                        {% for filterForm in formExport.filters %}
+                            <div class="grid grid-cols-[10rem_10rem_1fr_1fr] items-center gap-3"
+                                 data-filter-target="row" data-filter-column="{{ filterForm.vars.name }}">
+                                <label class="text-sm text-slate-700 dark:text-slate-300">{{ filterForm.vars.label }}</label>
+                                {{ form_widget(filterForm.operator, {'attr': {'data-filter-target': 'operator', 'data-action': 'change->filter#toggleValue2'}}) }}
+                                {{ form_widget(filterForm.value, {'attr': {'data-filter-target': 'value'}}) }}
+                                {{ form_widget(filterForm.value2, {'attr': {'data-filter-target': 'value2'}}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% do formExport.filters.setRendered %}
+            {% endif %}
+
             {{ form_row(formExport.file_format) }}
             {{ form_row(formExport.separator) }}
             {{ form_row(formExport.charset) }}
 
-            <div class="flex justify-end">
-                <button type="submit"
-                        class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">Generate</button>
+            <div class="flex items-center justify-end gap-4">
+                <span data-count-target="result" class="text-sm"></span>
+                <button type="button" data-action="click->count#check"
+                        class="inline-flex items-center rounded-md bg-white px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700">Vérifier</button>
+                <button type="submit" data-count-target="generate" disabled
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-700">Generate</button>
             </div>
             {{ form_end(formExport) }}
         </div>

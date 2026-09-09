@@ -33,6 +33,13 @@ interface SmartExportInterface
     public function handleFrom(): bool;
 
     /**
+     * Counts how many rows the current form submission would export, without
+     * fetching them, so the admin can check the size before generating a
+     * potentially huge export.
+     */
+    public function count(): int;
+
+    /**
      * @param null|string $filename
      * @return BinaryFileResponse|StreamedResponse|null
      * @throws SpreadSheetException

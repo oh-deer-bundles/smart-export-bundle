@@ -29,6 +29,27 @@
     {{ parent() }}
 {% endblock %}
 
+{#
+    Widget block for Odb\SmartExportBundle\Form\Type\FilterOptionBooleanType — the block
+    name is auto-derived by Symfony from the class name, so a host app can override just
+    this block in its own form theme without touching anything else. The built-in
+    choice_widget_expanded this would otherwise inherit never renders each radio's own
+    label in this app's form theming stack (long-standing, unexplained quirk with
+    expanded ChoiceType children), so labels are built by hand here instead.
+#}
+{% block filter_option_boolean_widget %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' flex items-center gap-4')|trim}) %}
+    <div {{ block('widget_container_attributes') }}>
+        {% for child in form %}
+            {% set boolLabelKey = child.vars.value == '1' ? 'seb.filter.boolean.yes' : (child.vars.value == '0' ? 'seb.filter.boolean.no' : 'seb.filter.boolean.unfiltered') %}
+            <label class="mr-4 inline-flex items-center gap-1 text-sm text-slate-700 dark:text-slate-300">
+                {{ form_widget(child) }}
+                {{ boolLabelKey|trans({}, 'smart_export_bundle_forms') }}
+            </label>
+        {% endfor %}
+    </div>
+{% endblock %}
+
 {% block form_help %}
     {% set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' mt-1 text-xs text-slate-500 dark:text-slate-400')|trim}) %}
     {{ parent() }}

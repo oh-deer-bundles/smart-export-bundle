@@ -38,6 +38,23 @@ class SmartExportColumnRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
+    /**
+     * @return SmartExportColumn[]
+     */
+    public function getFilterableColumnsByEngineUuid(string $engineUuid): array
+    {
+        $qb = $this->createQueryBuilder('sec')
+            ->leftJoin('sec.engine', 'see')
+            ->where('see.uuid = :engineUuid')
+            ->andWhere('sec.enabled = 1')
+            ->andWhere('sec.filterable = 1')
+            ->setParameter('engineUuid', $engineUuid, 'uuid')
+            ->orderBy('sec.choicePosition', 'ASC')
+            ->addOrderBy('sec.choiceLabel','ASC');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function getColumnsByEngineUuid(string $engineUuid)
     {
         $qb = $this->createQueryBuilder('sec')

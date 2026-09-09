@@ -46,7 +46,7 @@ class SmartExportEngineType extends AbstractType
                 'required' => true,
                 'placeholder' => 'seb.class_name.placeholder'
             ])
-        ; 
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

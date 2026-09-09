@@ -138,6 +138,114 @@
                 <source>seb.class_property.helper</source>
                 <target>Tel que défini dans votre entité pour les relations enchainer les propriétés avec un point ex addresses.city</target>
             </trans-unit>
+            <trans-unit id="35">
+                <source>seb.filterable.label</source>
+                <target>Filtrable</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>seb.filterable.helper</source>
+                <target>Affiche un filtre pour cette colonne dans le popup d'export</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>seb.filter_default_value.label</source>
+                <target>Valeur de filtre par défaut</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>seb.filter_default_value.helper</source>
+                <target>Préremplit le filtre tant que l'utilisateur n'a jamais filtré cet export</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>seb.filter.operator.none</source>
+                <target>-- pas de filtre --</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>seb.filter.operator.contains</source>
+                <target>contient</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>seb.filter.operator.not_contains</source>
+                <target>ne contient pas</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>seb.filter.operator.starts_with</source>
+                <target>commence par</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>seb.filter.operator.ends_with</source>
+                <target>finit par</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>seb.filter.operator.equal</source>
+                <target>égal à</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>seb.filter.operator.gt</source>
+                <target>supérieur à</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>seb.filter.operator.gte</source>
+                <target>supérieur ou égal à</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>seb.filter.operator.lt</source>
+                <target>inférieur à</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>seb.filter.operator.lte</source>
+                <target>inférieur ou égal à</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>seb.filter.operator.between</source>
+                <target>entre</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>seb.filter.operator.before</source>
+                <target>avant le</target>
+            </trans-unit>
+            <trans-unit id="51">
+                <source>seb.filter.operator.after</source>
+                <target>après le</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>seb.filter.boolean.yes</source>
+                <target>Oui</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>seb.filter.boolean.no</source>
+                <target>Non</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>seb.filter_widget.label</source>
+                <target>Type de filtre</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>seb.filter_widget.helper</source>
+                <target>"select" propose toutes les valeurs distinctes existantes plutôt qu'un champ de recherche</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>seb.filter_widget.auto</source>
+                <target>Automatique (selon l'interprète)</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>seb.filter_widget.select</source>
+                <target>Liste des valeurs existantes (choix multiple)</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>seb.filter_widget.single_select</source>
+                <target>Liste des valeurs existantes (choix unique)</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>seb.filter.operator.in</source>
+                <target>est l'une de</target>
+            </trans-unit>
+            <trans-unit id="59">
+                <source>seb.filter.operator.not_in</source>
+                <target>n'est aucune de</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>seb.filter.boolean.unfiltered</source>
+                <target>Non filtré</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
