@@ -6,7 +6,9 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 use Odb\SmartExportBundle\Repository\SmartExportEngineRepository;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\UuidV7;
 
 #[ORM\Entity(repositoryClass: SmartExportEngineRepository::class)]
@@ -16,53 +18,33 @@ class SmartExportEngine
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[ORM\Column(type: 'integer')]
-    private $id;
+    #[ORM\Column]
+    private ?int $id = null;
 
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
     private UuidV7 $uuid;
 
-    /**
-     * @var DateTime
-     */
-    #[ORM\Column(name: 'created_at', type: 'datetime')]
-    private $createdAt;
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    private DateTime $createdAt;
 
-    /**
-     * @var DateTime
-     */
-    #[ORM\Column(name: 'updated_at', type: 'datetime')]
-    private $updatedAt;
 
-    /**
-     * @var bool
-     */
-    #[ORM\Column(type: 'boolean')]
-    private $enabled = 1;
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
+    private DateTime $updatedAt;
 
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(type: 'string', length: 16, nullable: true)]
-    private $code;
+    #[ORM\Column(options: ['default' => true])]
+    private bool $enabled = true;
 
-    /**
-     * @var string|null
-     */
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $code = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
+    #[ORM\Column(name: 'class_name', length: 128)]
+    private string $className;
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $name;
-
-    /**
-     * @var string
-     */
-    #[ORM\Column(name: 'class_name', type: 'string', length: 128)]
-    private $className;
-
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $description;
+    private ?string $description = null;
 
     /**
      * @var Collection
@@ -96,6 +78,12 @@ class SmartExportEngine
     {
         $this->columns = new ArrayCollection();
         $this->uuid = new UuidV7();
+        // $createdAt/$updatedAt are non-nullable typed properties with no default:
+        // left uninitialized, updateDate()'s own getCreatedAt() === null check
+        // (meant to only set createdAt once, on the FIRST persist) throws
+        // "must not be accessed before initialization" instead of returning null.
+        $this->createdAt = new DateTime();
+        $this->updatedAt = new DateTime();
     }
 
     public function getId(): ?int
@@ -106,6 +94,20 @@ class SmartExportEngine
     public function getUuid(): UuidV7
     {
         return $this->uuid;
+    }
+
+    /**
+     * Not used by normal engine creation (the constructor already generates a
+     * fresh uuid) — exists for SmartExportEngineTransfer's import, so a config
+     * promoted from one environment to another (e.g. dev -> recette) can keep
+     * the SAME uuid a host app's `smart_export_popup($uuid)` calls already
+     * reference, instead of silently breaking every one of them.
+     */
+    public function setUuid(UuidV7 $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
     }
 
     public function getCreatedAt(): ?\DateTime

@@ -24,31 +24,46 @@ class SmartExportChoice implements SmartExportChoiceInterface
      */
     public function getChoices(string $engineUuid) :array
     {
-        $choices_em = $this->exportColumnRepository->getChoicesByEngineUuid($engineUuid);
         $response = [];
-        $columnGroups = [];
+        foreach ($this->getPickableChoiceRows($engineUuid) as $row) {
+            $response[$row['label']] = $row['id'];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Every column row for this engine, deduped so a cellGroup counts once
+     * (represented by its first-encountered column) — the single source of
+     * truth for "what is one pickable choice", shared by getChoices() (label
+     * => id, feeding the ChoiceType) and getDefaultSelectedFieldIds() (which
+     * additionally needs each row's selectedByDefault flag, unlike getChoices()'s
+     * flat shape).
+     * @return array<int, array<string, mixed>>
+     */
+    private function getPickableChoiceRows(string $engineUuid): array
+    {
+        $response = [];
         $cellGroups = [];
-        foreach ($choices_em as $row) {
-            if(
-                $row['columnGroup'] &&
-                (
-                    (
-                        !$row['cellGroup']
-                        || !in_array($row['columnGroup'].'_'.$row['cellGroup'], $cellGroups,true)
-                    )
-                    || !in_array($row['columnGroup'], $columnGroups,true)
-                )
-            ) {
-                $response[$row['label']] = $row['id'];
-                $columnGroups[] = $row['columnGroup'];
-                if($row['cellGroup']) {
-                    $cellGroups[] =  $row['columnGroup'].'_'.$row['cellGroup'];
+        foreach ($this->exportColumnRepository->getChoicesByEngineUuid($engineUuid) as $row) {
+            if ($row['cellGroup']) {
+                if (in_array($row['cellGroup'], $cellGroups, true)) {
+                    continue;
                 }
-            } elseif ($row['cellGroup'] && !in_array($row['cellGroup'], $cellGroups,true)) {
-                $response[$row['label']] = $row['id'];
                 $cellGroups[] = $row['cellGroup'];
-            } elseif (!$row['columnGroup'] && !$row['cellGroup']) {
-                $response[$row['label']] = $row['id'];
+            }
+            $response[] = $row;
+        }
+
+        return $response;
+    }
+
+    public function getDefaultSelectedFieldIds(string $engineUuid): array
+    {
+        $response = [];
+        foreach ($this->getPickableChoiceRows($engineUuid) as $row) {
+            if (!empty($row['selectedByDefault'])) {
+                $response[] = $row['id'];
             }
         }
 
@@ -75,20 +90,10 @@ class SmartExportChoice implements SmartExportChoiceInterface
             if($column instanceof SmartExportColumn) {
                 $key = $column->getClassProperty();
 
-
                 if($column->getCellGroupIndex()) {
                     $key = '#'.$column->getCellGroupIndex();
                 }
 
-                // todo not working
-                if ($column->getColumnGroupIndex()) {
-                    $key = '#'.$column->getColumnGroupIndex();
-                    if(!$column->getCellGroupIndex()) {
-                        $key .= '_'.$column->getClassProperty();
-                    } else {
-                        $key .= '_'.$column->getCellGroupIndex();
-                    }
-                }
                 $columns[$key][] = $column;
 
                 if (in_array($column->getId(), $selectedColumns,true)){
@@ -112,6 +117,16 @@ class SmartExportChoice implements SmartExportChoiceInterface
     public function getFilterableColumns(string $engineUuid): array
     {
         return $this->exportColumnRepository->getFilterableColumnsByEngineUuid($engineUuid);
+    }
+
+    public function getColumnsIndexedById(string $engineUuid): array
+    {
+        $response = [];
+        foreach ($this->exportColumnRepository->getColumnsByEngineUuid($engineUuid) as $column) {
+            $response[$column->getId()] = $column;
+        }
+
+        return $response;
     }
 
     public function getDistinctValuesForColumn(SmartExportColumn $column): array

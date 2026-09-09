@@ -26,3 +26,16 @@ odb_smart_export_admin_count:
     path: /admin/count/{uuid}
     controller: odb.smart-export.controller.admin::count
     methods: [POST]
+
+odb_smart_export_admin_export:
+    path: /admin/export/{uuid}
+    controller: odb.smart-export.controller.admin::exportEngine
+
+odb_smart_export_admin_import:
+    path: /admin/import
+    controller: odb.smart-export.controller.admin::importForm
+
+odb_smart_export_admin_import_commit:
+    path: /admin/import/commit
+    controller: odb.smart-export.controller.admin::importCommit
+    methods: [POST]

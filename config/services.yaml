@@ -84,13 +84,17 @@ services:
     Odb\SmartExportBundle\Services\SmartExportChoiceInterface:
         alias: odb.smart-export.choice
 
+    Odb\SmartExportBundle\Services\NullAllowedIdsVoter: ~
+
     odb.smart-export.allowed_ids_resolver:
         class: Odb\SmartExportBundle\Services\AllowedIdsResolver
         public: false
         arguments:
             - '@odb.smart-export.allowed_ids_cache'
             - '@Symfony\Bundle\SecurityBundle\Security'
+            - '@odb.smart-export.ids_voter'
             - '%odb_smart_export.security.restricted_entities%'
+            - '%odb_smart_export.security.allowed_ids_ttl%'
 
     odb.smart-export.query:
         class: '%odb.smart-export.query.class%'
@@ -101,6 +105,17 @@ services:
 
     Odb\SmartExportBundle\Services\SmartExportQueryInterface:
         alias: odb.smart-export.query
+
+    odb.smart-export.engine_transfer:
+        class: Odb\SmartExportBundle\Services\SmartExportEngineTransfer
+        public: true
+        arguments:
+            - '@odb.smart-export.engine.repository'
+            - '@odb.smart-export.column.repository'
+            - '@odb.smart-export.query'
+
+    Odb\SmartExportBundle\Services\SmartExportEngineTransferInterface:
+        alias: odb.smart-export.engine_transfer
 
     # FormType
     odb.smart-export.form:
@@ -139,4 +154,13 @@ services:
         arguments:
             - '@odb.smart-export.admin'
             - '@odb.smart-export.export'
+            - '@odb.smart-export.choice'
+            - '@odb.smart-export.engine_transfer'
             - '%odb_smart_export.max_rows%'
+
+    # Twig integration: {{ smart_export_popup(uuid) }} for host applications.
+    # autoconfigure: true tags this as a twig.extension automatically (it implements
+    # Twig\Extension\ExtensionInterface via AbstractExtension) — no further wiring needed.
+    odb.smart-export.twig_extension:
+        class: Odb\SmartExportBundle\Twig\SmartExportExtension
+        public: false

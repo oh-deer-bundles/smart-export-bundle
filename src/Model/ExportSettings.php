@@ -16,6 +16,16 @@ class ExportSettings
      */
     private array $filters = [];
 
+    /**
+     * Explicit primary-entity id restriction requested by the caller (the
+     * smart_export_popup() Twig function's `id` option — a single id or an
+     * array of ids), e.g. scoping a "Télécharger" link on a customer row to
+     * that one customer. Empty means no restriction beyond the usual filters
+     * and security.restricted_entities checks.
+     * @var array<int, int|string>
+     */
+    private array $idFilter = [];
+
     private string $code;
 
     private ?string $formattedCode = null;
@@ -67,6 +77,17 @@ class ExportSettings
     public function setFilters(array $filters): static
     {
         $this->filters = $filters;
+        return $this;
+    }
+
+    public function getIdFilter(): array
+    {
+        return $this->idFilter;
+    }
+
+    public function setIdFilter(array $idFilter): static
+    {
+        $this->idFilter = $idFilter;
         return $this;
     }
 

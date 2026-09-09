@@ -36,6 +36,4 @@ class EditSmartExportEngineType extends SmartExportEngineType
             ])
         ;
     }
-
-
 }

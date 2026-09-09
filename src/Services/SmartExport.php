@@ -143,6 +143,7 @@ class SmartExport implements SmartExportInterface
         $this->exportSettings->setEngine($definitions['engine']);
         $this->exportSettings->setColumns($definitions['columns']);
         $this->exportSettings->setFilters($this->smartExportChoice->resolveFilters($this->uuid, $this->getRawSubmittedFilters()));
+        $this->exportSettings->setIdFilter($this->getSubmittedIdFilter());
         $this->exportSettings->setFileFormat($this->form->get('file_format')->getData());
         $this->exportSettings->setCharset($this->form->get('charset')->getData());
         $this->exportSettings->setSeparator($this->form->get('separator')->getData());
@@ -181,6 +182,23 @@ class SmartExport implements SmartExportInterface
         }
 
         return $filters;
+    }
+
+    /**
+     * Reads the `id_filter` hidden field (smart_export_popup()'s `id` option,
+     * JSON-encoded by AdminController::demoExport() — see SmartExportType) back
+     * into a plain array. Empty means no explicit id restriction was requested.
+     * @return array<int, int|string>
+     */
+    private function getSubmittedIdFilter(): array
+    {
+        $raw = $this->form->get('id_filter')->getData();
+        if (empty($raw)) {
+            return [];
+        }
+
+        $decoded = json_decode((string) $raw, true);
+        return is_array($decoded) ? array_values($decoded) : [$decoded];
     }
 
     private function setRawData(): void

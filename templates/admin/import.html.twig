@@ -1,0 +1,135 @@
+{% extends '@OdbSmartExport/_layout.html.twig' %}
+{#
+    Three-step flow, never a one-shot upload-and-commit:
+    1. GET here (or a POST with no valid file) -> plain upload form.
+    2. POST here with a file -> AdminController::importForm() parses/validates it
+       (SmartExportEngineTransfer::parseImport()) and this template shows a
+       confirmation screen — nothing written to the database yet.
+    3. POST to odb_smart_export_admin_import_commit (the confirmation form
+       below) -> AdminController::importCommit() re-parses the SAME JSON
+       (re-embedded here as a hidden field) and, only if still valid, commits it.
+
+    Both forms carry data-turbo="false": _layout.html.twig loads Turbo Drive
+    globally, which intercepts every form submission and hard-requires the
+    response to be a redirect ("Form responses must redirect to another
+    location") — step 2's response is the confirmation page itself (200, not
+    a redirect), which Turbo would otherwise silently refuse to render at all.
+#}
+{% block body %}
+    <h1 class="mb-6 text-center text-2xl font-semibold text-slate-900 dark:text-white">{{ 'seb.import.title'|trans({}, 'smart_export_bundle_forms') }}</h1>
+
+    {% if uploadError %}
+        <div class="mx-auto mb-6 max-w-lg rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800">
+            {{ uploadError|trans({}, 'smart_export_bundle_forms') }}
+        </div>
+    {% endif %}
+
+    {% if preview and not preview.valid %}
+        <div class="mx-auto mb-6 max-w-lg rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-900/30 dark:text-red-300 dark:ring-red-800">
+            <p class="mb-1 font-medium">{{ 'seb.import.errors_title'|trans({}, 'smart_export_bundle_forms') }}</p>
+            <ul class="list-disc pl-5">
+                {% for error in preview.errors %}
+                    {% set parts = error|split('|') %}
+                    <li>{{ parts[0]|trans({'%value%': parts[1]|default('')}, 'smart_export_bundle_forms') }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if preview and preview.valid %}
+        <div class="mb-6 rounded-lg bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
+            <div class="flex items-center gap-3 border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">{{ 'seb.import.preview_title'|trans({}, 'smart_export_bundle_forms') }}</h2>
+                {% if preview.update %}
+                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">{{ 'seb.import.mode_update'|trans({'%name%': preview.existingEngine.name ?: preview.existingEngine.code}, 'smart_export_bundle_forms') }}</span>
+                {% else %}
+                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">{{ 'seb.import.mode_create'|trans({}, 'smart_export_bundle_forms') }}</span>
+                {% endif %}
+            </div>
+
+            {% if preview.warnings|length > 0 %}
+                <div class="mx-6 mt-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-inset ring-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-800">
+                    <ul class="list-disc pl-5">
+                        {% for warning in preview.warnings %}
+                            {% set parts = warning|split('|') %}
+                            <li>{{ parts[0]|trans({'%value%': parts[1]|default('')}, 'smart_export_bundle_forms') }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 gap-x-6 gap-y-3 px-6 py-4 sm:grid-cols-2">
+                <div>
+                    <span class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ 'seb.import.field.name'|trans({}, 'smart_export_bundle_forms') }}</span>
+                    <span class="text-sm text-slate-900 dark:text-slate-100">{{ preview.header.name ?: '—' }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ 'seb.import.field.code'|trans({}, 'smart_export_bundle_forms') }}</span>
+                    <span class="text-sm text-slate-900 dark:text-slate-100">{{ preview.header.code ?: '—' }}</span>
+                </div>
+                <div class="sm:col-span-2">
+                    <span class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ 'seb.import.field.description'|trans({}, 'smart_export_bundle_forms') }}</span>
+                    <span class="text-sm text-slate-900 dark:text-slate-100">{{ preview.header.description ?: '—' }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ 'seb.import.field.class_name'|trans({}, 'smart_export_bundle_forms') }}</span>
+                    <span class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ preview.header.className }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">{{ 'seb.import.field.enabled'|trans({}, 'smart_export_bundle_forms') }}</span>
+                    <span class="text-sm text-slate-900 dark:text-slate-100">{{ preview.header.enabled ? 'Y' : 'N' }}</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto px-6 pb-4">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                    <thead>
+                    <tr>
+                        <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Property</th>
+                        <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Label</th>
+                        <th class="px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Interpreter</th>
+                        <th class="px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Filterable</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                    {% for column in preview.columns %}
+                        <tr>
+                            <td class="px-2 py-2 font-mono text-xs text-slate-700 dark:text-slate-300">{{ column.classProperty }}</td>
+                            <td class="px-2 py-2 text-sm text-slate-700 dark:text-slate-300">{{ column.label }}</td>
+                            <td class="px-2 py-2 text-sm text-slate-700 dark:text-slate-300">{{ column.interpreter }}</td>
+                            <td class="px-2 py-2 text-center text-sm text-slate-700 dark:text-slate-300">{{ column.filterable ? 'Y' : 'N' }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">{{ 'seb.import.columns_count'|trans({'%count%': preview.columns|length}, 'smart_export_bundle_forms') }}</p>
+            </div>
+
+            <form method="post" action="{{ url('odb_smart_export_admin_import_commit') }}" data-turbo="false" class="flex justify-end gap-3 border-t border-slate-200 px-6 py-4 dark:border-slate-700">
+                <input type="hidden" name="_token" value="{{ csrf_token('odb_smart_export_admin_import') }}">
+                <textarea name="import_json" hidden>{{ preview.rawJson }}</textarea>
+                <a href="{{ url('odb_smart_export_admin_index') }}"
+                   class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700">{{ 'seb.import.cancel'|trans({}, 'smart_export_bundle_forms') }}</a>
+                <button type="submit"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">{{ 'seb.import.confirm'|trans({}, 'smart_export_bundle_forms') }}</button>
+            </form>
+        </div>
+    {% else %}
+        <div class="mx-auto max-w-lg rounded-lg bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
+            <div class="border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+                <h2 class="text-lg font-semibold text-slate-900 dark:text-white">{{ 'seb.import.upload_title'|trans({}, 'smart_export_bundle_forms') }}</h2>
+            </div>
+            <form method="post" action="{{ url('odb_smart_export_admin_import') }}" enctype="multipart/form-data" data-turbo="false" class="px-6 py-4">
+                <input type="hidden" name="_token" value="{{ csrf_token('odb_smart_export_admin_import') }}">
+                <input type="file" name="import_file" accept="application/json,.json" required
+                       class="block w-full text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-600 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-indigo-500 dark:text-slate-200">
+                <div class="mt-4 flex justify-end gap-3">
+                    <a href="{{ url('odb_smart_export_admin_index') }}"
+                       class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700">{{ 'seb.import.cancel'|trans({}, 'smart_export_bundle_forms') }}</a>
+                    <button type="submit"
+                            class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">{{ 'seb.import.upload_button'|trans({}, 'smart_export_bundle_forms') }}</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+{% endblock %}

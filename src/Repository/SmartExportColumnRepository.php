@@ -25,15 +25,17 @@ class SmartExportColumnRepository extends ServiceEntityRepository
             ->leftJoin('sec.engine', 'see')
             ->select(
                 'sec.id as id',
-                'sec.choiceLabel as label',
-                'sec.columnGroupIndex as columnGroup',
-                'sec.cellGroupIndex as cellGroup'
+                'sec.label as label',
+                'sec.cellGroupIndex as cellGroup',
+                'sec.classProperty as classProperty',
+                'sec.selectedByDefault as selectedByDefault'
             )
             ->where('see.uuid = :engineUuid')
             ->andWhere('sec.enabled = 1')
+            ->andWhere('sec.columnDisplay = 1')
             ->setParameter('engineUuid', $engineUuid, 'uuid')
             ->orderBy('sec.choicePosition', 'ASC')
-            ->addOrderBy('sec.choiceLabel','ASC');
+            ->addOrderBy('sec.label','ASC');
 
         return $qb->getQuery()->getArrayResult();
     }
@@ -50,7 +52,7 @@ class SmartExportColumnRepository extends ServiceEntityRepository
             ->andWhere('sec.filterable = 1')
             ->setParameter('engineUuid', $engineUuid, 'uuid')
             ->orderBy('sec.choicePosition', 'ASC')
-            ->addOrderBy('sec.choiceLabel','ASC');
+            ->addOrderBy('sec.label','ASC');
 
         return $qb->getQuery()->getResult();
     }
@@ -61,9 +63,10 @@ class SmartExportColumnRepository extends ServiceEntityRepository
             ->leftJoin('sec.engine', 'see')
             ->where('see.uuid = :engineUuid')
             ->andWhere('sec.enabled = 1')
+            ->andWhere('sec.columnDisplay = 1')
             ->setParameter('engineUuid', $engineUuid, 'uuid')
             ->orderBy('sec.choicePosition', 'ASC')
-            ->addOrderBy('sec.choiceLabel','ASC');
+            ->addOrderBy('sec.label','ASC');
 
         return $qb->getQuery()->getResult();
     }

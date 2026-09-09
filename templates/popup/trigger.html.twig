@@ -1,0 +1,58 @@
+{#
+    Rendered by the smart_export_popup() Twig function — see src/Twig/SmartExportExtension.php.
+    Cheap: no database access here, just two generateUrl() calls done by the extension.
+    The heavy part (columns, filters, distinct values) is fetched lazily, only once the
+    trigger below is actually clicked — see public/js/controllers/smart_export_loader_controller.js.
+#}
+{% if emitAssets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+    <link rel="stylesheet" href="{{ asset('bundles/odbsmartexport/css/popup.css') }}">
+    <script type="module" src="{{ asset('bundles/odbsmartexport/js/popup-app.js') }}"></script>
+{% endif %}
+
+{#
+    The outer div, not the trigger <a> itself, carries the layout class below —
+    it's this div (the smart-export-loader controller's own element, wrapping
+    both the trigger and the popup shell) that needs to size/center itself
+    correctly inside a themis action-column table cell alongside sibling
+    action links/buttons.
+#}
+<div class="smart-export-trigger-wrap"
+     data-controller="smart-export-loader"
+     data-smart-export-loader-export-url-value="{{ exportUrl }}"
+     data-action="smart-export-tabs:close->smart-export-loader#close keydown.esc@window->smart-export-loader#close">
+    {#
+        A real <a> (not a <button>) so it can be styled/positioned like any other
+        link in a host page's markup. href="#" plus the loader controller's
+        event.preventDefault() keeps it inert as a link — all it ever does is
+        open the popup.
+
+        Deliberately UNSTYLED: popup.css carries no color/spacing/decoration rule
+        for `smart-export-trigger` — the class is printed purely as a stable hook
+        (JS selector, host CSS, analytics…) if a caller wants one, never to impose
+        a look. The caller is always expected to style the link themselves, e.g.
+        via `options.class` (appended alongside `smart-export-trigger`, e.g.
+        Bootstrap's 'btn btn-sm btn-success' — nothing from this bundle fights it).
+
+        The label is rendered |raw: it's meant to carry markup (e.g. an icon before
+        the text, per the bundle's own usage docs), authored by the DEVELOPER calling
+        smart_export_popup() in their own Twig source — never end-user input.
+    #}
+    <a href="#" role="button"
+       class="smart-export-trigger{{ (options.class is defined and options.class) ? ' ' ~ options.class : '' }}"
+       data-action="click->smart-export-loader#open">
+        {{ (label ?? 'seb.popup.trigger_label'|trans({}, 'smart_export_bundle_forms'))|raw }}
+    </a>
+
+    <div class="smart-export-popup" hidden data-smart-export-loader-target="shell">
+        <div class="se-scrim" data-action="click->smart-export-loader#close"></div>
+        <div class="se-modal" role="dialog" aria-label="{{ 'seb.popup.dialog_label'|trans({}, 'smart_export_bundle_forms') }}" aria-modal="true">
+            <div class="se-modal-loading" data-smart-export-loader-target="loading">
+                <span class="spinner"></span> {{ 'seb.popup.loading'|trans({}, 'smart_export_bundle_forms') }}
+            </div>
+            <div data-smart-export-loader-target="content"></div>
+        </div>
+    </div>
+</div>

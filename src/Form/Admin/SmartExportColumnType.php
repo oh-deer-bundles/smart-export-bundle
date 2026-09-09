@@ -26,21 +26,12 @@ class SmartExportColumnType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('choiceLabel', TextType::class,[
-                'label' => 'seb.choice_label.label',
-                'help' => 'seb.choice_label.helper'
+            ->add('label', TextType::class,[
+                'label' => 'seb.label.label',
+                'help' => 'seb.label.helper'
             ])
             ->add('choicePosition', HiddenType::class,[
                 'attr' => ['class' => 'input_position'],
-                'required' => false
-            ])
-            ->add('headerLabel', TextType::class,[
-                    'label' => 'seb.header_label.label',
-                    'help' => 'seb.header_label.helper',
-            ])
-            ->add('columnGroupIndex', TextType::class,[
-                'label' => 'seb.column_group_index.label',
-                'help' => 'seb.column_group_index.helper',
                 'required' => false
             ])
 
@@ -69,9 +60,27 @@ class SmartExportColumnType extends AbstractType
                 'help' => 'seb.class_property.helper'
             ])
 
+            ->add('columnDisplay', CheckboxType::class, [
+                'label' => 'seb.column_display.label',
+                'help' => 'seb.column_display.helper',
+                'required' => false,
+            ])
+
+            ->add('selectedByDefault', CheckboxType::class, [
+                'label' => 'seb.selected_by_default.label',
+                'help' => 'seb.selected_by_default.helper',
+                'required' => false,
+            ])
+
             ->add('filterable', CheckboxType::class, [
                 'label' => 'seb.filterable.label',
                 'help' => 'seb.filterable.helper',
+                'required' => false,
+            ])
+
+            ->add('filterDisplay', CheckboxType::class, [
+                'label' => 'seb.filter_display.label',
+                'help' => 'seb.filter_display.helper',
                 'required' => false,
             ])
 

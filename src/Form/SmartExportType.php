@@ -28,6 +28,12 @@ class SmartExportType extends AbstractType
             ->add('file_format', ChoiceType::class, array(
                 'required'  => true,
                 'label'     => 'seb.file_format.label',
+                // Real radios (not a <select>) so the popup can style each choice as its
+                // own branded button (Excel/CSV/Texte) — see templates/popup/export_popup.html.twig.
+                // Needs an explicit default: unlike a <select>, an expanded ChoiceType
+                // doesn't auto-check any radio, so file_format would submit null otherwise.
+                'expanded'  => true,
+                'data'      => SmartExport::FORMAT_EXCEL_XLSX,
                 'choices'   => array(
                     'seb.file_format.excel' => SmartExport::FORMAT_EXCEL_XLSX,
                     'seb.file_format.csv' => SmartExport::FORMAT_CSV,
@@ -55,12 +61,32 @@ class SmartExportType extends AbstractType
             ))
             ->add('fields', HiddenType::class, array(
                 'required'  => true,
+                // Seeded server-side from the columns marked selectedByDefault (see
+                // AdminController::demoExport()) so a submission is valid even when the
+                // Colonnes panel itself isn't rendered (detailed=false — col_chips_controller.js,
+                // which normally recomputes this on connect(), never runs then). When the
+                // panel IS rendered this default is immediately overwritten by that same JS
+                // from the chips' own aria-pressed state, so it changes nothing there.
+                'data'      => $options['default_fields'] ?? null,
                 'attr' => ['class' => 'smart_export_fields']
             ))
             ->add('filters', FormType::class, [
                 'mapped' => false,
                 'required' => false,
                 'label' => false,
+            ])
+            // The two options below are the smart_export_popup() Twig function's `id` and
+            // `detailed` options, threaded through as hidden fields so they survive the
+            // count()/generate POST round trips exactly like `fields`/`file_format` do —
+            // see AdminController::demoExport() for where their initial value comes from
+            // (the trigger's query string, on the very first GET only).
+            ->add('id_filter', HiddenType::class, [
+                'required' => false,
+                'data' => $options['id_filter'] ?? null,
+            ])
+            ->add('detailed', HiddenType::class, [
+                'required' => false,
+                'data' => $options['detailed'] ?? '1',
             ])
             ->addEventListener(FormEvents::POST_SET_DATA, [$this,'onPostSetData'])
         ;
@@ -71,6 +97,9 @@ class SmartExportType extends AbstractType
         $resolver->setDefaults([
             'data_class' => null,
             'uuid_export' => null,
+            'default_fields' => null,
+            'id_filter' => null,
+            'detailed' => null,
             'translation_domain' => 'smart_export_bundle_forms',
         ]);
     }
@@ -92,8 +121,9 @@ class SmartExportType extends AbstractType
                 $filterOptions = [
                     'interpreter' => $column->getInterpreter(),
                     'default_value' => $column->getFilterDefaultValue(),
-                    'label' => $column->getChoiceLabel() ?: $column->getHeaderLabel(),
+                    'label' => $column->getLabel(),
                     'filter_widget' => $column->getFilterWidget(),
+                    'filter_display' => $column->isFilterDisplay(),
                 ];
                 if (in_array($column->getFilterWidget(), [FilterWidget::Select, FilterWidget::SingleSelect], true)) {
                     $filterOptions['choices'] = $this->exportChoice->getDistinctValuesForColumn($column);

@@ -4,6 +4,7 @@ namespace Odb\SmartExportBundle\Entity;
 
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 use Odb\SmartExportBundle\Enum\FilterWidget;
 use Odb\SmartExportBundle\Repository\SmartExportColumnRepository;
 
@@ -17,13 +18,11 @@ class SmartExportColumn
     #[ORM\Column]
     private ?int $id = null;
 
-
-    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
     private ?DateTime $createdAt = null;
 
-    #[ORM\Column(name: 'updated_at', type: 'datetime')]
+    #[ORM\Column(name: 'updated_at', type: Types::DATETIME_MUTABLE)]
     private ?DateTime $updatedAt = null;
-
 
     #[ORM\Column(options: ['default' => 1])]
     private bool $enabled = true;
@@ -31,58 +30,54 @@ class SmartExportColumn
     #[ORM\Column(name: 'choice_position', nullable: true)]
     private ?int $choicePosition = null;
 
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(name: 'choice_label', type: 'string', length: 128, nullable: true)]
-    private $choiceLabel;
+    #[ORM\Column(length: 128, nullable: true)]
+    private ?string $label = null;
+
+    #[ORM\Column(name: 'class_property', length: 128, nullable: true)]
+    private ?string $classProperty = null;
 
     /**
-     * @var string|null
+     * Whether this column is offered at all as a selectable export field in the
+     * Colonnes panel. Independent of $filterable: a column can be filterable
+     * without being exportable, and vice versa. Default true preserves the
+     * pre-existing behavior (every enabled column is offered).
      */
-    #[ORM\Column(name: 'header_label', type: 'string', length: 128, nullable: true)]
-    private $headerLabel;
+    #[ORM\Column(name: 'column_display', options: ['default' => 1])]
+    private bool $columnDisplay = true;
 
     /**
-     * @var string|null
+     * When columnDisplay is true, whether this column starts pre-checked in the
+     * Colonnes panel. Default false preserves the pre-existing behavior (nothing
+     * pre-checked).
      */
-    #[ORM\Column(name: 'class_property', type: 'string', length: 128, nullable: true)]
-    private $classProperty;
+    #[ORM\Column(name: 'selected_by_default', options: ['default' => 0])]
+    private bool $selectedByDefault = false;
+
+    #[ORM\Column(length: 16, nullable: true)]
+    private ?string $interpreter = null;
+
+    #[ORM\Column(name: 'cell_group_index', length: 32, nullable: true)]
+    private ?string $cellGroupIndex = null;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private bool $filterable = false;
 
     /**
-     * @var string|null
+     * When filterable is true, whether the filter widget is rendered in the
+     * Filtres panel at all, vs. applied silently server-side with
+     * filterDefaultValue and no visible UI. Default true preserves the
+     * pre-existing behavior (every filterable column's widget shows).
      */
-    #[ORM\Column(type: 'string', length: 16, nullable: true)]
-    private $interpreter;
+    #[ORM\Column(name: 'filter_display', options: ['default' => 1])]
+    private bool $filterDisplay = true;
 
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(name: 'column_group_index', type: 'string', length: 32, nullable: true)]
-    private $columnGroupIndex;
-
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(name: 'cell_group_index', type: 'string', length: 32, nullable: true)]
-    private $cellGroupIndex;
-
-    /**
-     * @var bool
-     */
-    #[ORM\Column(type: 'boolean', options: ['default' => false])]
-    private $filterable = false;
-
-    /**
-     * @var string|null
-     */
-    #[ORM\Column(name: 'filter_default_value', type: 'string', length: 255, nullable: true)]
-    private $filterDefaultValue;
+    #[ORM\Column(name: 'filter_default_value', length: 255, nullable: true)]
+    private ?string $filterDefaultValue = null;
 
     /**
      * Which form widget the demo popup uses for this filter — see FilterWidget.
      */
-    #[ORM\Column(name: 'filter_widget', type: 'string', length: 16, nullable: true, enumType: FilterWidget::class)]
+    #[ORM\Column(name: 'filter_widget', length: 16, nullable: true, enumType: FilterWidget::class)]
     private ?FilterWidget $filterWidget = FilterWidget::Auto;
 
     /**
@@ -167,26 +162,14 @@ class SmartExportColumn
         return $this;
     }
 
-    public function getChoiceLabel(): ?string
+    public function getLabel(): ?string
     {
-        return $this->choiceLabel;
+        return $this->label;
     }
 
-    public function setChoiceLabel(?string $choiceLabel): self
+    public function setLabel(?string $label): self
     {
-        $this->choiceLabel = $choiceLabel;
-
-        return $this;
-    }
-
-    public function getHeaderLabel(): ?string
-    {
-        return $this->headerLabel;
-    }
-
-    public function setHeaderLabel(?string $headerLabel): self
-    {
-        $this->headerLabel = $headerLabel;
+        $this->label = $label;
 
         return $this;
     }
@@ -199,18 +182,6 @@ class SmartExportColumn
     public function setInterpreter(?string $interpreter): self
     {
         $this->interpreter = $interpreter;
-
-        return $this;
-    }
-
-    public function getColumnGroupIndex(): ?string
-    {
-        return $this->columnGroupIndex;
-    }
-
-    public function setColumnGroupIndex(?string $columnGroupIndex): self
-    {
-        $this->columnGroupIndex = $columnGroupIndex;
 
         return $this;
     }
@@ -239,6 +210,30 @@ class SmartExportColumn
         return $this;
     }
 
+    public function isColumnDisplay(): bool
+    {
+        return $this->columnDisplay;
+    }
+
+    public function setColumnDisplay(bool $columnDisplay): self
+    {
+        $this->columnDisplay = $columnDisplay;
+
+        return $this;
+    }
+
+    public function isSelectedByDefault(): bool
+    {
+        return $this->selectedByDefault;
+    }
+
+    public function setSelectedByDefault(bool $selectedByDefault): self
+    {
+        $this->selectedByDefault = $selectedByDefault;
+
+        return $this;
+    }
+
     public function isFilterable(): ?bool
     {
         return $this->filterable;
@@ -247,6 +242,18 @@ class SmartExportColumn
     public function setFilterable(bool $filterable): self
     {
         $this->filterable = $filterable;
+
+        return $this;
+    }
+
+    public function isFilterDisplay(): bool
+    {
+        return $this->filterDisplay;
+    }
+
+    public function setFilterDisplay(bool $filterDisplay): self
+    {
+        $this->filterDisplay = $filterDisplay;
 
         return $this;
     }

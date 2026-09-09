@@ -1,0 +1,234 @@
+{% form_theme formExport '@OdbSmartExport/form/popup_layout.html.twig' %}
+
+{#
+    Fetched lazily by smart_export_loader_controller.js (see templates/popup/trigger.html.twig)
+    and injected into the trigger's already-printed modal shell. This fragment is
+    everything that goes INSIDE .se-modal — the outer .smart-export-popup/.se-scrim/.se-modal
+    wrapper is printed once, up front, by trigger.html.twig so it can show a loading
+    state before this (DB-backed) content exists.
+
+    Three mutually exclusive panels (Filtres/Colonnes/Format), navigated by the header
+    stepper or the footer Précédent/Suivant — see works/cahier-des-charges-popup-export.md.
+#}
+{% set visibleFilterForms = formExport.filters|filter(f => f.vars.filter_display) %}
+{% set hasFiltersPanel = visibleFilterForms|length > 0 %}
+{# smart_export_popup()'s `detailed` option (default true): the Colonnes step is
+   always shown — `detailed` only controls whether each column chip additionally
+   shows its technical property name (classProperty) under the label, or just the
+   label alone (a plainer, less technical picker for a non-admin audience).
+   NOT `detailed|default(true)`: Twig's `default` filter treats boolean false as
+   "empty" and would silently replace it with the fallback, defeating the option
+   entirely — only fall back when the variable is genuinely undefined. #}
+{% set detailed = detailed is defined ? detailed : true %}
+
+<div class="se-popup-form"
+     data-controller="smart-export-tabs smart-export-count smart-export-columns smart-export-filter"
+     data-smart-export-count-url-value="{{ url('odb_smart_export_admin_count', {'uuid': uuid}) }}"
+     data-smart-export-filter-uuid-value="{{ uuid }}"
+     data-smart-export-columns-selected-suffix-value="{{ 'seb.popup.selected_suffix'|trans({}, 'smart_export_bundle_forms') }}"
+     data-smart-export-columns-none-selected-value="{{ 'seb.popup.none_selected'|trans({}, 'smart_export_bundle_forms') }}"
+     data-action="smart-export-tabs:enteredFormat->smart-export-count#check submit->smart-export-filter#persist">
+    {{ form_start(formExport, {'attr': {
+        'data-turbo': 'false',
+        'action': url('odb_smart_export_admin_demo_export', {'uuid': uuid}),
+    }}) }}
+
+    <div class="se-modal-head">
+        <div class="se-modal-head-top">
+            <div>
+                <div class="eyebrow">{{ 'seb.popup.eyebrow'|trans({}, 'smart_export_bundle_forms') }}</div>
+                <h1>{{ engine.name ?: engine.code }}</h1>
+                <div class="sub">{{ 'seb.popup.entity_label'|trans({}, 'smart_export_bundle_forms') }} <span class="mono">{{ engine.className }}</span> &middot; {{ 'seb.popup.code_label'|trans({}, 'smart_export_bundle_forms') }} <span class="mono">{{ engine.code }}</span></div>
+            </div>
+            <button type="button" class="close-btn" data-action="click->smart-export-tabs#close" aria-label="{{ 'seb.popup.close'|trans({}, 'smart_export_bundle_forms') }}">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3l10 10M13 3L3 13"/></svg>
+            </button>
+        </div>
+
+        <div class="stepper" role="tablist" aria-label="{{ 'seb.popup.steps_label'|trans({}, 'smart_export_bundle_forms') }}" data-smart-export-tabs-target="tablist">
+            {% if hasFiltersPanel %}
+            <button class="step" type="button" role="tab" id="tab-filtres" aria-selected="true" aria-controls="sec-filtres" data-target="sec-filtres" data-done="optional" data-hint="{{ 'seb.popup.hint_filters'|trans({}, 'smart_export_bundle_forms') }}" data-action="click->smart-export-tabs#go">
+                <span class="step-dot"><span class="step-num">1</span><svg class="step-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3L9.5 3.6"/></svg></span>
+                <span class="step-label">{{ 'seb.popup.step_filters'|trans({}, 'smart_export_bundle_forms') }}<span class="step-tag">{{ 'seb.popup.optional'|trans({}, 'smart_export_bundle_forms') }}</span></span>
+            </button>
+            <span class="step-line"></span>
+            {% endif %}
+            <button class="step" type="button" role="tab" id="tab-colonnes" aria-selected="{{ hasFiltersPanel ? 'false' : 'true' }}" aria-controls="sec-colonnes" data-target="sec-colonnes" data-done="true" data-hint="{{ 'seb.popup.hint_columns'|trans({}, 'smart_export_bundle_forms') }}" data-action="click->smart-export-tabs#go">
+                <span class="step-dot"><span class="step-num">{{ hasFiltersPanel ? '2' : '1' }}</span><svg class="step-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3L9.5 3.6"/></svg></span>
+                <span class="step-label">{{ 'seb.popup.step_columns'|trans({}, 'smart_export_bundle_forms') }}<span class="step-tag" data-smart-export-columns-target="stepTag"></span></span>
+            </button>
+            <span class="step-line"></span>
+            <button class="step" type="button" role="tab" id="tab-format" aria-selected="false" aria-controls="sec-format" data-target="sec-format" data-done="false" data-hint="{{ 'seb.popup.hint_format'|trans({}, 'smart_export_bundle_forms') }}" data-action="click->smart-export-tabs#go">
+                <span class="step-dot"><span class="step-num">{{ hasFiltersPanel ? '3' : '2' }}</span><svg class="step-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3L9.5 3.6"/></svg></span>
+                <span class="step-label">{{ 'seb.popup.step_format'|trans({}, 'smart_export_bundle_forms') }}<span class="step-tag" data-smart-export-tabs-target="formatTag">{{ 'seb.popup.to_verify'|trans({}, 'smart_export_bundle_forms') }}</span></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="se-modal-body">
+
+        {% if hasFiltersPanel %}
+        <section id="sec-filtres" class="panel" role="tabpanel" aria-labelledby="tab-filtres">
+            <div class="section-head">
+                <div class="section-title">
+                    <h2>{{ 'seb.popup.step_filters'|trans({}, 'smart_export_bundle_forms') }}</h2>
+                    <span class="badge-dynamic">{{ 'seb.popup.conditional_section'|trans({}, 'smart_export_bundle_forms') }}</span>
+                </div>
+                <div class="seg" role="group">
+                    <button type="button" aria-pressed="true" data-action="click->smart-export-filter#setLayout" data-layout="grid">{{ 'seb.popup.layout_grid'|trans({}, 'smart_export_bundle_forms') }}</button>
+                    <button type="button" aria-pressed="false" data-action="click->smart-export-filter#setLayout" data-layout="list">{{ 'seb.popup.layout_list'|trans({}, 'smart_export_bundle_forms') }}</button>
+                </div>
+            </div>
+
+            <div class="filters-panel">
+                <div class="filters mode-grid" data-smart-export-filter-target="grid">
+                    {% for filterForm in visibleFilterForms %}
+                        {% set widget = filterForm.vars.filter_widget.value %}
+                        {% set interpreter = filterForm.vars.interpreter %}
+                        <div class="tile" data-smart-export-filter-target="row" data-filter-column="{{ filterForm.vars.name }}">
+                            <div class="tile-head">
+                                {% if widget == 'single_select' %}
+                                    <span class="tile-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6.3"/><path d="M5.3 8l1.9 1.9L10.7 6"/></svg></span>
+                                {% elseif widget == 'select' %}
+                                    <span class="tile-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 4.2h11M2.5 8h11M2.5 11.8h7"/></svg></span>
+                                {% elseif interpreter in ['boolean', 'boolean_translated'] %}
+                                    <span class="tile-icon"><svg viewBox="0 0 20 12" fill="none"><rect x="1" y="1" width="18" height="10" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="14" cy="6" r="3.4" fill="currentColor"/></svg></span>
+                                {% elseif interpreter in ['integer', 'int', 'float', 'euro'] %}
+                                    <span class="tile-icon glyph">#</span>
+                                {% elseif interpreter == 'date' %}
+                                    <span class="tile-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3.2" width="12" height="10.8" rx="1.6"/><path d="M2 6.4h12M5.3 1.8v2.4M10.7 1.8v2.4"/></svg></span>
+                                {% else %}
+                                    <span class="tile-icon glyph">Aa</span>
+                                {% endif %}
+                                <span class="tile-label">{{ filterForm.vars.label }}</span>
+                                <span class="tile-prop mono">{{ filterForm.vars.name|slice(4) }}</span>
+                            </div>
+                            <div class="tile-body">
+                                {% if widget == 'single_select' %}
+                                    {{ form_widget(filterForm.operator, {'attr': {'data-smart-export-filter-target': 'operator'}}) }}
+                                    {{ form_widget(filterForm.value, {'attr': {'data-smart-export-filter-target': 'value'}}) }}
+                                {% elseif widget == 'select' %}
+                                    {{ form_widget(filterForm.operator, {'attr': {'data-smart-export-filter-target': 'operator'}}) }}
+                                    {{ form_widget(filterForm.value, {'attr': {'class': 'se-native-multiselect', 'data-smart-export-filter-target': 'value'}}) }}
+                                    <div class="chipbox" data-smart-export-filter-target="chipbox"></div>
+                                {% elseif interpreter in ['boolean', 'boolean_translated'] %}
+                                    {{ form_widget(filterForm.operator, {'attr': {'data-smart-export-filter-target': 'operator'}}) }}
+                                    {{ form_widget(filterForm.value, {'attr': {'data-smart-export-filter-target': 'value'}}) }}
+                                {% elseif interpreter in ['integer', 'int', 'float', 'euro', 'date'] %}
+                                    {{ form_widget(filterForm.operator, {'attr': {'data-smart-export-filter-target': 'operator', 'data-action': 'change->smart-export-filter#toggleValue2'}}) }}
+                                    <div class="row2">
+                                        {{ form_widget(filterForm.value, {'attr': {'data-smart-export-filter-target': 'value'}}) }}
+                                        {{ form_widget(filterForm.value2, {'attr': {'data-smart-export-filter-target': 'value2'}}) }}
+                                    </div>
+                                {% else %}
+                                    {{ form_widget(filterForm.operator, {'attr': {'data-smart-export-filter-target': 'operator'}}) }}
+                                    {{ form_widget(filterForm.value, {'attr': {'data-smart-export-filter-target': 'value'}}) }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        {# Filters with filterDisplay=false still exist as real sub-forms (so their
+           SmartExportColumn::filterDefaultValue keeps applying) but are never shown —
+           the `hidden` attribute (not CSS/JS) keeps them out of view while still
+           submitting their pre-set value with the rest of the form. #}
+        <div hidden aria-hidden="true">
+            {% for filterForm in formExport.filters %}
+                {% if not filterForm.vars.filter_display %}
+                    {{ form_widget(filterForm.operator) }}
+                    {{ form_widget(filterForm.value) }}
+                    {{ form_widget(filterForm.value2) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% do formExport.filters.setRendered %}
+
+        <section id="sec-colonnes" class="panel" role="tabpanel" aria-labelledby="tab-colonnes" {{ hasFiltersPanel ? 'hidden' : '' }}>
+            <div class="section-head">
+                <div class="section-title">
+                    <h2>{{ 'seb.popup.step_columns'|trans({}, 'smart_export_bundle_forms') }}</h2>
+                    <span class="count tnum" data-smart-export-columns-target="count"></span>
+                </div>
+                <div class="col-actions">
+                    <button type="button" class="ghost-btn" data-action="click->smart-export-columns#selectAll">{{ 'seb.popup.select_all'|trans({}, 'smart_export_bundle_forms') }}</button>
+                    <button type="button" class="ghost-btn" data-action="click->smart-export-columns#selectNone">{{ 'seb.popup.select_none'|trans({}, 'smart_export_bundle_forms') }}</button>
+                </div>
+            </div>
+            <div class="col-chips" data-smart-export-columns-target="chips">
+                {% for choiceView in formExport.choices.vars.choices %}
+                    {% set column = columns[choiceView.value] ?? null %}
+                    <button type="button" class="col-chip" data-action="click->smart-export-columns#toggle"
+                            aria-pressed="{{ (column and column.selectedByDefault) ? 'true' : 'false' }}"
+                            data-value="{{ choiceView.value }}">
+                        <span class="dot"></span>{{ choiceView.label }}
+                        {# smart_export_popup()'s `detailed` option (default true): a simpler,
+                           less technical column picker — for a non-admin audience — only shows
+                           the label, never the underlying classProperty path. #}
+                        {% if detailed and column %}<span class="prop mono">{{ column.classProperty }}</span>{% endif %}
+                    </button>
+                {% endfor %}
+            </div>
+            {{ form_widget(formExport.fields, {'attr': {'data-smart-export-columns-target': 'input'}}) }}
+            {% do formExport.choices.setRendered %}
+        </section>
+
+        <section id="sec-format" class="panel" role="tabpanel" aria-labelledby="tab-format" hidden
+                 data-controller="smart-export-format" data-action="change->smart-export-format#sync">
+            <div class="section-head">
+                <div class="section-title"><h2>{{ 'seb.popup.step_format'|trans({}, 'smart_export_bundle_forms') }}</h2></div>
+            </div>
+
+            <div class="verify-card" data-smart-export-count-target="card"
+                 data-loading-text="{{ 'seb.popup.verify_pending'|trans({}, 'smart_export_bundle_forms') }}"
+                 data-ok-text="{{ 'seb.popup.verify_ok'|trans({}, 'smart_export_bundle_forms') }}"
+                 data-blocked-text="{{ 'seb.popup.verify_blocked'|trans({}, 'smart_export_bundle_forms') }}"
+                 data-error-text="{{ 'seb.popup.verify_error'|trans({}, 'smart_export_bundle_forms') }}">
+                <span class="spinner"></span>
+                <span>{{ 'seb.popup.verify_pending'|trans({}, 'smart_export_bundle_forms') }}</span>
+            </div>
+
+            <div class="fmt-options" data-smart-export-format-target="options">
+                <div class="field">{{ form_label(formExport.separator) }}{{ form_widget(formExport.separator) }}</div>
+                <div class="field">{{ form_label(formExport.charset) }}{{ form_widget(formExport.charset) }}</div>
+            </div>
+
+            <div class="format-row">
+                {% for radio in formExport.file_format %}
+                    {% set fmt = radio.vars.value %}
+                    <label class="fmt-btn" data-fmt="{{ fmt }}">
+                        {{ form_widget(radio) }}
+                        <span class="icon">
+                            {% if fmt == 'xlsx' %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2.5"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
+                            {% elseif fmt == 'csv' %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 8.5h11M6.5 12h11M6.5 15.5h7"/></svg>
+                            {% else %}
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4.5h9l3 3v12H6z"/><path d="M8.5 12h7M8.5 15h7"/></svg>
+                            {% endif %}
+                        </span>
+                        <span>
+                            <span class="label">{{ radio.vars.label|trans({}, 'smart_export_bundle_forms') }}</span>
+                            <span class="ext">.{{ fmt }}</span>
+                        </span>
+                        <svg class="fmt-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4L16 6"/></svg>
+                    </label>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <div class="se-modal-foot">
+        <div class="foot-hint" data-smart-export-tabs-target="hint">{{ hasFiltersPanel ? 'seb.popup.hint_filters'|trans({}, 'smart_export_bundle_forms') : 'seb.popup.hint_columns'|trans({}, 'smart_export_bundle_forms') }}</div>
+        <div class="foot-actions">
+            <button type="button" class="btn btn-secondary" data-smart-export-tabs-target="back" hidden data-action="click->smart-export-tabs#back">{{ 'seb.popup.back'|trans({}, 'smart_export_bundle_forms') }}</button>
+            <button type="button" class="btn btn-primary" data-smart-export-tabs-target="next" data-action="click->smart-export-tabs#next">{{ 'seb.popup.next'|trans({}, 'smart_export_bundle_forms') }}</button>
+            <button type="submit" class="btn btn-primary" data-smart-export-tabs-target="generate" data-smart-export-count-target="generate" hidden disabled>{{ 'seb.popup.generate'|trans({}, 'smart_export_bundle_forms') }}</button>
+        </div>
+    </div>
+
+    {{ form_end(formExport) }}
+</div>

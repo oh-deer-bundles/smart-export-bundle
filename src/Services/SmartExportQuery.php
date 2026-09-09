@@ -41,7 +41,7 @@ class SmartExportQuery implements SmartExportQueryInterface
         ['primaryEntity' => $primaryEntity, 'primaryAlias' => $primaryAlias, 'queryParameters' => $queryParameters, 'filters' => $filters]
             = $this->resolveQueryParameters($exportSettings);
 
-        $queryResult = $this->executeQuery($queryParameters, $filters, $primaryEntity, $primaryAlias);
+        $queryResult = $this->executeQuery($queryParameters, $filters, $primaryEntity, $primaryAlias, $exportSettings->getIdFilter());
         return $this->dataBuilder($queryParameters, $queryResult?:[], $exportSettings->getFileFormat());
     }
 
@@ -58,7 +58,7 @@ class SmartExportQuery implements SmartExportQueryInterface
         ['primaryEntity' => $primaryEntity, 'primaryAlias' => $primaryAlias, 'queryParameters' => $queryParameters, 'filters' => $filters]
             = $this->resolveQueryParameters($exportSettings);
 
-        return $this->executeCountQuery($queryParameters, $filters, $primaryEntity, $primaryAlias);
+        return $this->executeCountQuery($queryParameters, $filters, $primaryEntity, $primaryAlias, $exportSettings->getIdFilter());
     }
 
     /**
@@ -98,7 +98,7 @@ class SmartExportQuery implements SmartExportQueryInterface
 
                         $queryParameters[$loop] = [
                             'exportKey' => $key,
-                            'exportLabel' => $column->getHeaderLabel(),
+                            'exportLabel' => $column->getLabel(),
                             'interpreter' => $column->getInterpreter(),
                             'rules' => $rules,
                             'entity' =>  $primaryAlias,
@@ -265,7 +265,7 @@ class SmartExportQuery implements SmartExportQueryInterface
         if (in_array($childProperty,$this->getNameProperties($entity), true )) {
             return [
                 'exportKey' => $key,
-                'exportLabel' => $column->getHeaderLabel(),
+                'exportLabel' => $column->getLabel(),
                 'interpreter' => $column->getInterpreter(),
                 'rules' => $rules,
                 'entity' =>  $entity,
@@ -309,7 +309,7 @@ class SmartExportQuery implements SmartExportQueryInterface
      * filter on Customer if Customer is restricted, exactly as a "Customer -> Contract
      * -> Item" export would).
      */
-    private function buildQueryBuilder(array $queryParameters, array $filters, string $primaryClassName, string $primaryAlias): QueryBuilder
+    private function buildQueryBuilder(array $queryParameters, array $filters, string $primaryClassName, string $primaryAlias, array $idFilter = []): QueryBuilder
     {
         $qb = new QueryBuilder($this->entityManager);
         $qb->from($primaryClassName, $primaryAlias);
@@ -331,9 +331,31 @@ class SmartExportQuery implements SmartExportQueryInterface
 
         $aliasToEntityClass = $this->registerJoins($qb, $joinSources, $primaryAlias, $primaryClassName);
         $this->applySecurityRestrictions($qb, $aliasToEntityClass);
+        $this->applyIdFilter($qb, $primaryAlias, $idFilter);
         $this->applyFilters($qb, $filters);
 
         return $qb;
+    }
+
+    /**
+     * Explicit id restriction requested by the caller (smart_export_popup()'s
+     * `id` option: a single id or an array of ids of the export's PRIMARY
+     * entity — e.g. scoping a "Télécharger" link on a customer row to that
+     * one customer, or on a contract's items to that contract's item ids).
+     * Applied as an additional AND'd WHERE clause: it only narrows the
+     * export further, it never bypasses applySecurityRestrictions() above —
+     * a restricted entity's allowed-ids check still applies on top, exactly
+     * like any other filter, so a caller can never pass an id they don't
+     * have access to and see it exported anyway.
+     */
+    private function applyIdFilter(QueryBuilder $qb, string $primaryAlias, array $idFilter): void
+    {
+        if (empty($idFilter)) {
+            return;
+        }
+
+        $qb->andWhere($qb->expr()->in($primaryAlias.'.id', ':odbSmartExportIdFilter'))
+            ->setParameter('odbSmartExportIdFilter', array_values($idFilter));
     }
 
     /**
@@ -437,9 +459,9 @@ class SmartExportQuery implements SmartExportQueryInterface
     /**
      * Create an ORM QueryBuilder and return the execution
      */
-    private function executeQuery(array $queryParameters, array $filters, string $primaryClassName, string $primaryAlias): int|array|string
+    private function executeQuery(array $queryParameters, array $filters, string $primaryClassName, string $primaryAlias, array $idFilter = []): int|array|string
     {
-        $qb = $this->buildQueryBuilder($queryParameters, $filters, $primaryClassName, $primaryAlias);
+        $qb = $this->buildQueryBuilder($queryParameters, $filters, $primaryClassName, $primaryAlias, $idFilter);
         foreach ($queryParameters as $parameter){
             $qb->addSelect($parameter['select']);
         }
@@ -455,9 +477,9 @@ class SmartExportQuery implements SmartExportQueryInterface
      * count — that fan-out is exactly the runaway-export scenario max_rows guards
      * against, so counting distinct primary ids would silently defeat the limit.
      */
-    private function executeCountQuery(array $queryParameters, array $filters, string $primaryClassName, string $primaryAlias): int
+    private function executeCountQuery(array $queryParameters, array $filters, string $primaryClassName, string $primaryAlias, array $idFilter = []): int
     {
-        $qb = $this->buildQueryBuilder($queryParameters, $filters, $primaryClassName, $primaryAlias);
+        $qb = $this->buildQueryBuilder($queryParameters, $filters, $primaryClassName, $primaryAlias, $idFilter);
         $qb->select('COUNT('.$primaryAlias.'.id)');
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -569,7 +591,7 @@ class SmartExportQuery implements SmartExportQueryInterface
     }
 
     /**
-     * Create an array with query result, and different settings like cellGroup, columnGroup and format the values
+     * Create an array with query result, and different settings like cellGroup and format the values
      * @param array $queryParameters
      * @param array $queryResult
      * @param string $file_format

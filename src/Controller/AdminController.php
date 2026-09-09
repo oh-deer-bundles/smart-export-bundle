@@ -6,11 +6,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Odb\SmartExportBundle\Model\ExcelStyle;
 use Odb\SmartExportBundle\Services\SmartExportAdminInterface;
+use Odb\SmartExportBundle\Services\SmartExportChoiceInterface;
+use Odb\SmartExportBundle\Services\SmartExportEngineTransferInterface;
 use Odb\SmartExportBundle\Services\SmartExportInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +28,8 @@ class AdminController extends AbstractController
     public function __construct(
         private readonly SmartExportAdminInterface $smartExportAdmin,
         private readonly SmartExportInterface $smartExport,
+        private readonly SmartExportChoiceInterface $smartExportChoice,
+        private readonly SmartExportEngineTransferInterface $smartExportEngineTransfer,
         private readonly int $maxRows,
     ){
     }
@@ -90,6 +95,84 @@ class AdminController extends AbstractController
     {
         $this->smartExportAdmin->removeEngine($uuid);
         return $this->redirectToRoute('odb_smart_export_admin_index');
+    }
+
+    /**
+     * "Exporter" button on the edit page: a minimal JSON snapshot (header +
+     * columns) of this one engine — meant to be saved/versioned, or imported
+     * into another instance via importForm()/importCommit() below.
+     */
+    public function exportEngine(string $uuid): Response
+    {
+        $engine = $this->smartExport->findByUuid($uuid);
+        $data = $this->smartExportEngineTransfer->export($engine);
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        $filename = ($engine->getCode() ?: 'smart-export').'_'.(new \DateTime())->format('Ymd_His').'.json';
+
+        return new Response($json, 200, [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
+    }
+
+    /**
+     * GET: plain upload form. POST (file just uploaded): parses/validates it
+     * and shows a confirmation screen — nothing is written to the database
+     * yet, see importCommit() for that. The confirmation screen re-embeds the
+     * parsed JSON as a hidden field so importCommit() can re-parse and act on
+     * the exact same content the user actually confirmed, rather than trusting
+     * a session/cache entry that could have moved on since.
+     */
+    public function importForm(Request $request): Response
+    {
+        $preview = null;
+        $uploadError = null;
+
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('odb_smart_export_admin_import', (string) $request->request->get('_token'))) {
+                throw new AccessDeniedHttpException();
+            }
+
+            $file = $request->files->get('import_file');
+            if (!$file instanceof UploadedFile || !$file->isValid()) {
+                $uploadError = 'seb.import.error.no_file';
+            } else {
+                $json = file_get_contents($file->getPathname());
+                $preview = false !== $json ? $this->smartExportEngineTransfer->parseImport($json) : null;
+                if (null === $preview) {
+                    $uploadError = 'seb.import.error.unreadable_file';
+                }
+            }
+        }
+
+        return $this->render('@OdbSmartExport/admin/import.html.twig', [
+            'preview' => $preview,
+            'uploadError' => $uploadError,
+        ]);
+    }
+
+    /**
+     * The explicit confirmation step: re-parses the JSON the user just
+     * reviewed (never trusts it blindly) and, only if still valid, commits it.
+     */
+    public function importCommit(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('odb_smart_export_admin_import', (string) $request->request->get('_token'))) {
+            throw new AccessDeniedHttpException();
+        }
+
+        $preview = $this->smartExportEngineTransfer->parseImport((string) $request->request->get('import_json'));
+        if (!$preview->isValid()) {
+            return $this->render('@OdbSmartExport/admin/import.html.twig', [
+                'preview' => $preview,
+                'uploadError' => null,
+            ]);
+        }
+
+        $engine = $this->smartExportEngineTransfer->commitImport($preview);
+
+        return $this->redirectToRoute('odb_smart_export_admin_edit', ['uuid' => $engine->getUuid()]);
     }
 
     public function getDataStructure(string $token, EntityManagerInterface $entityManager): StreamedResponse
@@ -216,17 +299,44 @@ class AdminController extends AbstractController
         );
     }
 
-    public function demoExport(string $uuid)
+    public function demoExport(string $uuid, Request $request)
     {
-        $formExport = $this->smartExport->createForm($uuid);
+        // default_fields seeds the `fields` hidden field with the same value
+        // col_chips_controller.js computes from the DOM on connect() (both read
+        // selectedByDefault) — a harmless, redundant default for the brief window
+        // before that JS runs, not something the Colonnes panel relies on: it's
+        // always rendered (see export_popup.html.twig; `detailed` only toggles
+        // whether each chip additionally shows its technical property name).
+        $formOptions = [
+            'default_fields' => json_encode($this->smartExportChoice->getDefaultSelectedFieldIds($uuid)),
+        ];
+
+        // smart_export_popup()'s `id`/`detailed` options (SmartExportExtension) only ever
+        // reach this action as query params on the trigger's very first fetch — the later
+        // count()/generate POSTs carry them forward as hidden form fields instead (see
+        // SmartExportType), so they're only read from the query string here.
+        if ($request->query->has('id')) {
+            $idFilter = array_values((array) ($request->query->all()['id'] ?? []));
+            if (!empty($idFilter)) {
+                $formOptions['id_filter'] = json_encode($idFilter);
+            }
+        }
+        if ($request->query->has('detailed')) {
+            $formOptions['detailed'] = $request->query->getBoolean('detailed') ? '1' : '0';
+        }
+
+        $formExport = $this->smartExport->createForm($uuid, $formOptions);
         $isValid = $this->smartExport->handleFrom();
         if ($isValid) {
             return $this->smartExport->getResponse();
         }
 
-        return $this->render('@OdbSmartExport/admin/demo.html.twig', [
+        return $this->render('@OdbSmartExport/popup/export_popup.html.twig', [
             'formExport' => $formExport,
-            'uuid' => $uuid
+            'uuid' => $uuid,
+            'engine' => $this->smartExport->findByUuid($uuid),
+            'columns' => $this->smartExportChoice->getColumnsIndexedById($uuid),
+            'detailed' => '0' !== $formExport->get('detailed')->getData(),
         ]);
     }
 

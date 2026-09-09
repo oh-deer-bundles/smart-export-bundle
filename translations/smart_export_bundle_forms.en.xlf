@@ -91,28 +91,12 @@
                 <target>File a short description to this export</target>
             </trans-unit>
             <trans-unit id="21">
-                <source>seb.choice_label.label</source>
-                <target>Form label</target>
+                <source>seb.label.label</source>
+                <target>Label</target>
             </trans-unit>
             <trans-unit id="22">
-                <source>seb.choice_label.helper</source>
-                <target>Shown in export form</target>
-            </trans-unit>
-            <trans-unit id="23">
-                <source>seb.header_label.label</source>
-                <target>Column label</target>
-            </trans-unit>
-            <trans-unit id="24">
-                <source>seb.header_label.helper</source>
-                <target>Shown in file header</target>
-            </trans-unit>
-            <trans-unit id="25">
-                <source>seb.column_group_index.label</source>
-                <target>Group of columns label</target>
-            </trans-unit>
-            <trans-unit id="26">
-                <source>seb.column_group_index.helper</source>
-                <target>Works only for Excel export</target>
+                <source>seb.label.helper</source>
+                <target>Shown in the export form and in the generated file's header</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>seb.cell_group_index.label</source>
@@ -138,6 +122,22 @@
                 <source>seb.class_property.helper</source>
                 <target>File like as define in the entity, eg. in case of relation write it like twig: addresses.city</target>
             </trans-unit>
+            <trans-unit id="62">
+                <source>seb.column_display.label</source>
+                <target>Column displayed</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>seb.column_display.helper</source>
+                <target>Offers this column in the Colonnes panel of the export popup. Uncheck for a column used only as a filter, never exported</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>seb.selected_by_default.label</source>
+                <target>Selected by default</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>seb.selected_by_default.helper</source>
+                <target>The column starts checked in the Colonnes panel (no effect if "Column displayed" is unchecked)</target>
+            </trans-unit>
             <trans-unit id="35">
                 <source>seb.filterable.label</source>
                 <target>Filterable</target>
@@ -145,6 +145,14 @@
             <trans-unit id="36">
                 <source>seb.filterable.helper</source>
                 <target>Shows a filter for this column in the export popup</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>seb.filter_display.label</source>
+                <target>Filter displayed</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>seb.filter_display.helper</source>
+                <target>Shows the filter widget in the Filtres panel. Uncheck to apply "Default filter value" silently, without showing it to the user</target>
             </trans-unit>
             <trans-unit id="37">
                 <source>seb.filter_default_value.label</source>
@@ -245,6 +253,262 @@
             <trans-unit id="60">
                 <source>seb.filter.boolean.unfiltered</source>
                 <target>Not filtered</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>seb.popup.eyebrow</source>
+                <target>New export</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>seb.popup.entity_label</source>
+                <target>Entity</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>seb.popup.code_label</source>
+                <target>code</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>seb.popup.close</source>
+                <target>Close</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>seb.popup.steps_label</source>
+                <target>Export steps</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>seb.popup.step_filters</source>
+                <target>Filters</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>seb.popup.optional</source>
+                <target>optional</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>seb.popup.step_columns</source>
+                <target>Columns</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>seb.popup.step_format</source>
+                <target>Format</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>seb.popup.to_verify</source>
+                <target>to verify</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>seb.popup.conditional_section</source>
+                <target>conditional section</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>seb.popup.layout_grid</source>
+                <target>Grid</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>seb.popup.layout_list</source>
+                <target>List</target>
+            </trans-unit>
+            <trans-unit id="81">
+                <source>seb.popup.select_all</source>
+                <target>All</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>seb.popup.select_none</source>
+                <target>None</target>
+            </trans-unit>
+            <trans-unit id="83">
+                <source>seb.popup.verify_pending</source>
+                <target>Counting rows…</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>seb.popup.hint_filters</source>
+                <target>Step 1 of 3 — filters are optional.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>seb.popup.hint_columns</source>
+                <target>Step 2 of 3 — choose the columns to export.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>seb.popup.back</source>
+                <target>Back</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>seb.popup.next</source>
+                <target>Next</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>seb.popup.generate</source>
+                <target>Generate export</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>seb.popup.trigger_label</source>
+                <target>Export</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>seb.popup.dialog_label</source>
+                <target>Export generator</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>seb.popup.loading</source>
+                <target>Loading…</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>seb.popup.selected_suffix</source>
+                <target>selected</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>seb.popup.none_selected</source>
+                <target>none selected</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>seb.popup.verify_ok</source>
+                <target>row(s) — export possible</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>seb.popup.verify_blocked</source>
+                <target>row(s), the limit is %max%. Narrow your selection.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>seb.popup.verify_error</source>
+                <target>Could not check the row count.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>seb.integration.view_code_button</source>
+                <target>View code</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>seb.integration.dialog_title</source>
+                <target>Integrate this export popup</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>seb.integration.description</source>
+                <target>This export popup can be embedded directly into any Twig page of a host Symfony project, via the %function% function provided by this bundle. No extra CSS or JS to load on the host side: assets (styles, Stimulus) load only on the first call of the function on the page, and the popup content (columns, filters) loads only when the trigger is clicked.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>seb.integration.example_label</source>
+                <target>Example:</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>seb.integration.argument_hint</source>
+                <target>The 1st argument (required) is this export's UUID. The 2nd argument (optional) customizes the trigger link's label — it accepts HTML (e.g. an icon). The 3rd argument (optional) is an options object: "class" adds CSS classes to the link (it ships unstyled), "detailed" (default true) shows or hides each column's technical property name in the Colonnes step, and "id" restricts the export to one id or an array of ids of the exported entity.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>seb.integration.close</source>
+                <target>Close</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>seb.popup.hint_format</source>
+                <target>Check the row count and pick a file format.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>seb.integration.example_options_label</source>
+                <target>Example with options:</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>seb.export.button</source>
+                <target>Export</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>seb.import.button</source>
+                <target>Import</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>seb.import.title</source>
+                <target>Import an export</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>seb.import.upload_title</source>
+                <target>Choose a file</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>seb.import.upload_button</source>
+                <target>Analyze</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>seb.import.cancel</source>
+                <target>Cancel</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>seb.import.confirm</source>
+                <target>Confirm import</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>seb.import.preview_title</source>
+                <target>Preview</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>seb.import.mode_update</source>
+                <target>Will update: %name%</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>seb.import.mode_create</source>
+                <target>Will create a new export</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>seb.import.errors_title</source>
+                <target>This file can't be imported:</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>seb.import.columns_count</source>
+                <target>%count% column(s)</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>seb.import.field.name</source>
+                <target>Name</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>seb.import.field.code</source>
+                <target>Code</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>seb.import.field.description</source>
+                <target>Description</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>seb.import.field.class_name</source>
+                <target>Related entity</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>seb.import.field.enabled</source>
+                <target>Enabled</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>seb.import.error.invalid_json</source>
+                <target>The file doesn't contain valid JSON.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>seb.import.error.missing_header</source>
+                <target>The "header" field is missing or invalid.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>seb.import.error.missing_columns</source>
+                <target>The "columns" field is missing or invalid.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>seb.import.error.missing_class_name</source>
+                <target>header.className is required.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>seb.import.error.invalid_column</source>
+                <target>Column #%value%: invalid format.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>seb.import.error.column_missing_class_property</source>
+                <target>Column #%value%: "classProperty" is required.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>seb.import.error.no_file</source>
+                <target>Choose a file before submitting.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>seb.import.error.unreadable_file</source>
+                <target>The file couldn't be read.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>seb.import.warning.class_not_found</source>
+                <target>Class "%value%" doesn't exist in this application — check it's deployed before using this export.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>seb.import.warning.invalid_uuid</source>
+                <target>The file's uuid isn't valid and was ignored — a new export will be created.</target>
             </trans-unit>
         </body>
     </file>

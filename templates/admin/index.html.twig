@@ -1,12 +1,22 @@
 {% extends '@OdbSmartExport/_layout.html.twig' %}
 {% form_theme formAddEngine '@OdbSmartExport/form/tailwind_layout.html.twig' %}
+{# Icon-only action buttons (Demo export / Disable-Enable / Edit) — one row per engine,
+   so these are built once here rather than re-typed in the loop below. Each <svg> is
+   aria-hidden; the accessible name comes from the surrounding link/button instead
+   (title + aria-label, or an .sr-only span for the smart_export_popup() trigger, whose
+   label is the only way to reach its inner markup). #}
+{% set iconEye %}<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>{% endset %}
+{% set iconPower %}<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8.25"/><path d="M6.75 6.75a7.5 7.5 0 1010.5 0"/></svg>{% endset %}
+{% set iconPencil %}<svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/><path d="M15.75 6.75l1.5 1.5"/></svg>{% endset %}
 {% block body %}
     <div data-controller="dialog">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Index admin bundle</h1>
+            <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Smart Export Admin</h1>
             <div class="flex gap-3">
                 <a href="{{ url('odb_smart_export_admin_data_structure',{'token':csrf_token('odb_smart_export_admin_data_structure')}) }}"
                    class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-500">Download data structure</a>
+                <a href="{{ url('odb_smart_export_admin_import') }}"
+                   class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700">{{ 'seb.import.button'|trans({}, 'smart_export_bundle_forms') }}</a>
                 <button type="button" data-action="click->dialog#open"
                         class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500">New Export</button>
             </div>
@@ -34,7 +44,7 @@
         </dialog>
     </div>
 
-    <div data-controller="dialog">
+    <div>
         {% if engines|length > 0 %}
             <div class="overflow-x-auto rounded-lg ring-1 ring-slate-200 dark:ring-slate-700">
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
@@ -64,13 +74,13 @@
                             <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">{{ engine.updatedAt ? engine.createdAt|date('m/d/Y H:i:s') : '' }}</td>
                             <td class="px-4 py-3 text-right text-sm">
                                 <div class="flex justify-end gap-2">
-                                    <a href="{{ url('odb_smart_export_admin_demo_export', {'uuid':engine.uuid }) }}"
-                                       data-turbo-frame="demo-export-frame" data-action="click->dialog#open"
-                                       class="inline-flex items-center rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-500">Demo export</a>
+                                    <span title="Demo export">{{ smart_export_popup(engine.uuid, '<span class="sr-only">Demo export</span>' ~ iconEye, {'class': 'inline-flex items-center justify-center rounded-md bg-indigo-600 p-2 text-white shadow-sm hover:bg-indigo-500'}) }}</span>
                                     <a href="{{ url('odb_smart_export_admin_toggle', {'uuid':engine.uuid }) }}"
-                                       class="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-500">{{ engine.enabled ? 'Disable':'Enable' }}</a>
+                                       title="{{ engine.enabled ? 'Disable' : 'Enable' }}" aria-label="{{ engine.enabled ? 'Disable' : 'Enable' }}"
+                                       class="inline-flex items-center justify-center rounded-md bg-red-600 p-2 text-white shadow-sm hover:bg-red-500">{{ iconPower }}</a>
                                     <a href="{{ url('odb_smart_export_admin_edit', {'uuid':engine.uuid }) }}"
-                                       class="inline-flex items-center rounded-md bg-amber-500 px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-amber-400">Edit</a>
+                                       title="Edit" aria-label="Edit"
+                                       class="inline-flex items-center justify-center rounded-md bg-amber-500 p-2 text-white shadow-sm hover:bg-amber-400">{{ iconPencil }}</a>
                                 </div>
                             </td>
                         </tr>
@@ -78,13 +88,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <dialog data-dialog-target="dialog" data-action="click->dialog#closeOnBackdrop"
-                    class="w-full max-w-3xl rounded-lg bg-white p-6 text-slate-900 shadow-xl backdrop:bg-slate-900/50 dark:bg-slate-900 dark:text-slate-100">
-                <turbo-frame id="demo-export-frame" class="flex min-h-[12rem] items-center justify-center">
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Loading…</p>
-                </turbo-frame>
-            </dialog>
         {% else %}
             <p class="text-center text-lg text-slate-500 dark:text-slate-400">You must set an export</p>
         {% endif %}

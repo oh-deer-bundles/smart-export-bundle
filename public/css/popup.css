@@ -1,0 +1,363 @@
+/* Smart Export popup — extracted from works/export-generator-mockup.html.
+   Every selector is scoped under .smart-export-popup and every custom property
+   is prefixed --se-, so this stylesheet can be dropped into an arbitrary host
+   page without colliding with its own styles/tokens. No framework dependency
+   (no Tailwind, no Bootstrap) — plain CSS, plain element selectors. */
+
+.smart-export-popup {
+  --se-bg: #F3F4F8;
+  --se-surface: #FFFFFF;
+  --se-surface-alt: #ECEEF4;
+  --se-surface-sunken: #E4E6EF;
+  --se-ink: #1C2130;
+  --se-ink-soft: #5B6172;
+  --se-ink-faint: #8A90A3;
+  --se-border: #DCDFE7;
+  --se-border-soft: #E9EAF0;
+
+  --se-accent: #5A4FCF;
+  --se-accent-strong: #4B3FC0;
+  --se-accent-soft: #EDEBFB;
+  --se-accent-ink: #4B3FC0;
+  --se-accent-contrast: #FFFFFF;
+
+  --se-excel: #1D6F42;
+  --se-excel-soft: #E3F3EA;
+
+  --se-csv: #1272B3;
+  --se-csv-soft: #E3F1FA;
+
+  --se-txt: #8A6D3B;
+  --se-txt-soft: #F4EEE1;
+
+  --se-success: #1F8A55;
+  --se-success-soft: #E3F3EA;
+  --se-danger: #C0392B;
+  --se-danger-soft: #FBEAE7;
+
+  --se-shadow-modal: 0 24px 60px -20px rgba(28,33,48,.35), 0 4px 12px -4px rgba(28,33,48,.15);
+  --se-shadow-tile: 0 1px 2px rgba(28,33,48,.06);
+
+  --se-font-body: 'Hanken Grotesk', system-ui, sans-serif;
+  --se-font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  .smart-export-popup:not([data-theme="light"]) {
+    --se-bg: #14161C;
+    --se-surface: #1B1E27;
+    --se-surface-alt: #232733;
+    --se-surface-sunken: #1F222C;
+    --se-ink: #EDEEF3;
+    --se-ink-soft: #9AA0B4;
+    --se-ink-faint: #6B7086;
+    --se-border: #2E3240;
+    --se-border-soft: #262A36;
+
+    --se-accent: #8B7FFF;
+    --se-accent-strong: #A79CFF;
+    --se-accent-soft: #2A2650;
+    --se-accent-ink: #C9C1FF;
+    --se-accent-contrast: #181229;
+
+    --se-excel: #3FA86B;
+    --se-excel-soft: #16301F;
+
+    --se-csv: #4FA8E8;
+    --se-csv-soft: #132A3A;
+
+    --se-txt: #C9A876;
+    --se-txt-soft: #2A2216;
+
+    --se-success: #3FA86B;
+    --se-success-soft: #16301F;
+    --se-danger: #E0685A;
+    --se-danger-soft: #3A1E1B;
+
+    --se-shadow-modal: 0 24px 60px -20px rgba(0,0,0,.65), 0 4px 12px -4px rgba(0,0,0,.4);
+    --se-shadow-tile: 0 1px 2px rgba(0,0,0,.3);
+  }
+}
+.smart-export-popup[data-theme="dark"] {
+  --se-bg: #14161C;
+  --se-surface: #1B1E27;
+  --se-surface-alt: #232733;
+  --se-surface-sunken: #1F222C;
+  --se-ink: #EDEEF3;
+  --se-ink-soft: #9AA0B4;
+  --se-ink-faint: #6B7086;
+  --se-border: #2E3240;
+  --se-border-soft: #262A36;
+
+  --se-accent: #8B7FFF;
+  --se-accent-strong: #A79CFF;
+  --se-accent-soft: #2A2650;
+  --se-accent-ink: #C9C1FF;
+  --se-accent-contrast: #181229;
+
+  --se-excel: #3FA86B;
+  --se-excel-soft: #16301F;
+
+  --se-csv: #4FA8E8;
+  --se-csv-soft: #132A3A;
+
+  --se-txt: #C9A876;
+  --se-txt-soft: #2A2216;
+
+  --se-success: #3FA86B;
+  --se-success-soft: #16301F;
+  --se-danger: #E0685A;
+  --se-danger-soft: #3A1E1B;
+
+  --se-shadow-modal: 0 24px 60px -20px rgba(0,0,0,.65), 0 4px 12px -4px rgba(0,0,0,.4);
+  --se-shadow-tile: 0 1px 2px rgba(0,0,0,.3);
+}
+
+/* Safety net: any class-based display rule below has higher specificity than the
+   browser's own [hidden]{display:none}, which would otherwise silently lose —
+   exactly the trap public/js/controllers/filter_controller.js already warns about
+   for inline styles. This guarantees `el.hidden = true` always actually hides. */
+.smart-export-popup [hidden] { display: none !important; }
+
+.smart-export-popup, .smart-export-popup * { box-sizing: border-box; }
+.smart-export-popup {
+  font-family: var(--se-font-body);
+  font-size: 14px;
+  color: var(--se-ink);
+  -webkit-font-smoothing: antialiased;
+}
+.smart-export-popup h1, .smart-export-popup h2, .smart-export-popup h3 { text-wrap: balance; margin: 0; font-family: var(--se-font-body); }
+.smart-export-popup .mono { font-family: var(--se-font-mono); }
+.smart-export-popup .tnum { font-variant-numeric: tabular-nums; }
+
+/* ---------- overlay + modal shell ---------- */
+.smart-export-popup { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: flex-start; justify-content: center; padding: 20px; overflow: hidden; }
+.smart-export-popup[hidden] { display: none; }
+
+.smart-export-popup .se-scrim {
+  position: fixed; inset: 0; z-index: 1;
+  background: rgba(10,11,16,.42);
+  backdrop-filter: blur(3px);
+}
+@media (prefers-color-scheme: dark) {
+  .smart-export-popup:not([data-theme="light"]) .se-scrim { background: rgba(4,5,8,.6); }
+}
+.smart-export-popup[data-theme="dark"] .se-scrim { background: rgba(4,5,8,.6); }
+
+.smart-export-popup .se-modal {
+  position: relative; z-index: 2;
+  width: min(760px, 94vw);
+  max-height: min(92vh, 900px);
+  margin-top: 20px;
+  background: var(--se-surface);
+  border: 1px solid var(--se-border);
+  border-radius: 20px;
+  box-shadow: var(--se-shadow-modal);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.smart-export-popup .se-modal-loading {
+  flex: 1 1 auto;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; padding: 48px 24px;
+  color: var(--se-ink-soft); font-size: 13px;
+}
+.smart-export-popup .se-modal-loading[hidden] { display: none; }
+
+.smart-export-popup .se-modal-head { flex: none; display: flex; flex-direction: column; gap: 14px; padding: 16px 26px 14px; border-bottom: 1px solid var(--se-border-soft); }
+.smart-export-popup .se-modal-head-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.smart-export-popup .se-modal-head .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--se-accent-ink); margin-bottom: 4px; }
+.smart-export-popup .se-modal-head h1 { font-size: 19px; font-weight: 700; }
+.smart-export-popup .se-modal-head .sub { color: var(--se-ink-soft); font-size: 12.5px; margin-top: 3px; }
+.smart-export-popup .se-modal-head .sub .mono { color: var(--se-ink-faint); }
+
+.smart-export-popup .close-btn {
+  flex: none; width: 32px; height: 32px; border-radius: 9px;
+  border: 1px solid var(--se-border); background: var(--se-surface-alt);
+  color: var(--se-ink-soft); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+}
+.smart-export-popup .close-btn:hover { background: var(--se-danger-soft); color: var(--se-danger); border-color: transparent; }
+.smart-export-popup .close-btn:focus-visible,
+.smart-export-popup button:focus-visible,
+.smart-export-popup select:focus-visible,
+.smart-export-popup input:focus-visible {
+  outline: 2px solid var(--se-accent); outline-offset: 2px;
+}
+
+/* ---------- stepper ---------- */
+.smart-export-popup .stepper { display: flex; align-items: center; }
+.smart-export-popup .step { flex: none; display: flex; align-items: center; gap: 8px; background: transparent; border: none; padding: 4px 2px; margin: -4px -2px; cursor: pointer; border-radius: 8px; }
+.smart-export-popup .step-line { flex: 1 1 auto; height: 1px; background: var(--se-border); margin: 0 8px; min-width: 16px; }
+.smart-export-popup .step-dot {
+  position: relative; flex: none; width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--se-border); color: var(--se-ink-faint); background: var(--se-surface);
+  transition: background .18s, border-color .18s, color .18s;
+}
+.smart-export-popup .step-num { font: 600 11px var(--se-font-mono); }
+.smart-export-popup .step-check { display: none; width: 11px; height: 11px; }
+.smart-export-popup .step-label { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; font-size: 12.5px; font-weight: 600; color: var(--se-ink-faint); transition: color .18s; }
+.smart-export-popup .step-tag { font-size: 10px; font-weight: 500; color: var(--se-ink-faint); }
+
+.smart-export-popup .step[aria-selected="true"] .step-dot { border-color: var(--se-accent); color: var(--se-accent-ink); box-shadow: 0 0 0 3px var(--se-accent-soft); }
+.smart-export-popup .step[aria-selected="true"] .step-label { color: var(--se-ink); }
+
+.smart-export-popup .step[data-done="true"] .step-dot { background: var(--se-accent); border-color: var(--se-accent); color: var(--se-accent-contrast); }
+.smart-export-popup .step[data-done="true"] .step-num { display: none; }
+.smart-export-popup .step[data-done="true"] .step-check { display: block; }
+.smart-export-popup .step[data-done="true"] .step-label { color: var(--se-ink); }
+.smart-export-popup .step[data-done="true"] .step-tag { color: var(--se-accent-ink); }
+
+.smart-export-popup .step[data-done="optional"] .step-dot { border-style: dashed; }
+.smart-export-popup .step[data-done="optional"] .step-tag { font-style: italic; }
+
+.smart-export-popup .step[data-done="warn"] .step-dot { border-color: var(--se-danger); color: var(--se-danger); background: var(--se-danger-soft); }
+.smart-export-popup .step[data-done="warn"] .step-tag { color: var(--se-danger); font-style: normal; }
+
+/* ---------- body / panels ---------- */
+.smart-export-popup .se-modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 18px 26px 20px; display: flex; flex-direction: column; gap: 20px; }
+.smart-export-popup .panel[hidden] { display: none; }
+
+.smart-export-popup .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+.smart-export-popup .section-title { display: flex; align-items: baseline; gap: 8px; }
+.smart-export-popup .section-title h2 { font-size: 14px; font-weight: 700; }
+.smart-export-popup .section-title .count { color: var(--se-ink-faint); font-size: 12px; }
+.smart-export-popup .badge-dynamic { font-size: 10px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--se-accent-ink); background: var(--se-accent-soft); border-radius: 999px; padding: 3px 8px; }
+
+/* layout toggle */
+.smart-export-popup .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--se-surface-alt); border: 1px solid var(--se-border-soft); border-radius: 9px; }
+.smart-export-popup .seg button { border: none; background: transparent; color: var(--se-ink-soft); font: 500 12px var(--se-font-body); padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+.smart-export-popup .seg button[aria-pressed="true"] { background: var(--se-surface); color: var(--se-ink); box-shadow: var(--se-shadow-tile); font-weight: 600; }
+
+/* filters panel */
+.smart-export-popup .filters-panel { background: var(--se-surface-sunken); border: 1px solid var(--se-border-soft); border-radius: 14px; padding: 12px; }
+.smart-export-popup .filters { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (max-width: 480px) { .smart-export-popup .filters { grid-template-columns: 1fr; } }
+.smart-export-popup .tile { background: var(--se-surface); border: 1px solid var(--se-border); border-radius: 11px; padding: 9px 11px 10px; box-shadow: var(--se-shadow-tile); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.smart-export-popup .tile-head { display: flex; align-items: center; gap: 7px; }
+.smart-export-popup .tile-icon { flex: none; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: var(--se-accent-soft); color: var(--se-accent-ink); }
+.smart-export-popup .tile-icon svg { width: 13px; height: 13px; }
+.smart-export-popup .tile-icon.glyph { font: 600 11px var(--se-font-mono); }
+.smart-export-popup .tile-label { font-weight: 600; font-size: 12.5px; }
+.smart-export-popup .tile-prop { margin-left: auto; font-size: 10px; color: var(--se-ink-faint); }
+
+.smart-export-popup .tile-body { display: flex; flex-direction: column; gap: 6px; }
+.smart-export-popup .row2 { display: flex; gap: 6px; }
+.smart-export-popup .row2 > * { min-width: 0; }
+
+.smart-export-popup select,
+.smart-export-popup input[type="text"],
+.smart-export-popup input[type="number"],
+.smart-export-popup input[type="date"] {
+  font: 500 12.5px var(--se-font-body); color: var(--se-ink); background: var(--se-surface-alt);
+  border: 1px solid var(--se-border); border-radius: 7px; padding: 6px 8px; width: 100%;
+}
+.smart-export-popup select {
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235B6172' stroke-width='1.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; padding-right: 22px;
+}
+
+/* boolean tri-state control (filter_option_boolean_widget) */
+.smart-export-popup .tri { display: flex; gap: 5px; position: relative; }
+.smart-export-popup .tri label { flex: 1; text-align: center; font-size: 11.5px; font-weight: 600; padding: 6px 4px; border-radius: 7px; border: 1px solid var(--se-border); background: var(--se-surface-alt); color: var(--se-ink-soft); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.smart-export-popup .tri input { position: absolute; opacity: 0; pointer-events: none; }
+.smart-export-popup .tri input:checked + label { background: var(--se-accent); border-color: var(--se-accent); color: var(--se-accent-contrast); }
+.smart-export-popup .tri input:focus-visible + label { outline: 2px solid var(--se-accent); outline-offset: 2px; }
+
+/* multiselect chips */
+.smart-export-popup .chipbox { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; background: var(--se-surface-alt); border: 1px solid var(--se-border); border-radius: 7px; padding: 6px; min-height: 34px; }
+.smart-export-popup .chip { display: inline-flex; align-items: center; gap: 5px; background: var(--se-accent-soft); color: var(--se-accent-ink); border-radius: 6px; padding: 3px 4px 3px 8px; font: 600 11px var(--se-font-mono); }
+.smart-export-popup .chip button { border: none; background: transparent; color: inherit; cursor: pointer; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: .7; }
+.smart-export-popup .chip button:hover { opacity: 1; background: rgba(0,0,0,.08); }
+.smart-export-popup .chipbox select { flex: 1; min-width: 96px; border: none; background: transparent; padding: 3px 4px; }
+.smart-export-popup select[multiple].se-native-multiselect { display: none; }
+
+/* list mode */
+.smart-export-popup .filters.mode-list { grid-template-columns: 1fr; gap: 4px; }
+.smart-export-popup .filters.mode-list .tile { grid-column: 1/-1; flex-direction: row; align-items: center; padding: 9px 12px; }
+.smart-export-popup .filters.mode-list .tile-head { flex: 0 0 168px; }
+.smart-export-popup .filters.mode-list .tile-prop { display: none; }
+.smart-export-popup .filters.mode-list .tile-body { flex: 1; }
+.smart-export-popup .filters.mode-list .row2 { max-width: 420px; }
+.smart-export-popup .filters.mode-list .chipbox { max-width: 460px; }
+.smart-export-popup .filters.mode-list .tri { max-width: 320px; }
+
+/* columns */
+.smart-export-popup .col-actions { display: flex; gap: 6px; }
+.smart-export-popup .ghost-btn { font: 600 11.5px var(--se-font-body); color: var(--se-ink-soft); background: var(--se-surface-alt); border: 1px solid var(--se-border-soft); border-radius: 7px; padding: 5px 10px; cursor: pointer; }
+.smart-export-popup .ghost-btn:hover { color: var(--se-ink); border-color: var(--se-border); }
+
+.smart-export-popup .col-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.smart-export-popup .col-chip { display: inline-flex; align-items: center; gap: 6px; font: 600 12.5px var(--se-font-body); color: var(--se-ink-soft); background: var(--se-surface-alt); border: 1px solid var(--se-border); border-radius: 9px; padding: 7px 12px 7px 10px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.smart-export-popup .col-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--se-ink-faint); transition: background .15s; }
+.smart-export-popup .col-chip .prop { font: 500 10px var(--se-font-mono); color: var(--se-ink-faint); }
+.smart-export-popup .col-chip[aria-pressed="true"] { background: var(--se-accent-soft); border-color: var(--se-accent); color: var(--se-accent-ink); }
+.smart-export-popup .col-chip[aria-pressed="true"] .dot { background: var(--se-accent); }
+.smart-export-popup .col-chip[aria-pressed="true"] .prop { color: var(--se-accent-ink); opacity: .8; }
+
+/* format */
+.smart-export-popup .format-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.smart-export-popup .fmt-btn { flex: 1; min-width: 150px; position: relative; display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; cursor: pointer; background: var(--se-surface-alt); border: 1.5px solid var(--se-border); transition: border-color .15s, background .15s; }
+.smart-export-popup .fmt-btn input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+.smart-export-popup .fmt-btn .icon { flex: none; width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #fff; }
+.smart-export-popup .fmt-btn .icon svg { width: 18px; height: 18px; }
+.smart-export-popup .fmt-btn .label { font-weight: 700; font-size: 13px; display: block; }
+.smart-export-popup .fmt-btn .ext { font: 600 10.5px var(--se-font-mono); color: var(--se-ink-faint); }
+.smart-export-popup .fmt-btn[data-fmt="xlsx"] .icon { background: var(--se-excel); }
+.smart-export-popup .fmt-btn[data-fmt="csv"] .icon { background: var(--se-csv); }
+.smart-export-popup .fmt-btn[data-fmt="txt"] .icon { background: var(--se-txt); }
+.smart-export-popup .fmt-btn:has(input:checked)[data-fmt="xlsx"] { border-color: var(--se-excel); background: var(--se-excel-soft); }
+.smart-export-popup .fmt-btn:has(input:checked)[data-fmt="csv"] { border-color: var(--se-csv); background: var(--se-csv-soft); }
+.smart-export-popup .fmt-btn:has(input:checked)[data-fmt="txt"] { border-color: var(--se-txt); background: var(--se-txt-soft); }
+.smart-export-popup .fmt-check { margin-left: auto; width: 18px; height: 18px; opacity: 0; }
+.smart-export-popup .fmt-btn:has(input:checked) .fmt-check { opacity: 1; }
+.smart-export-popup .fmt-btn[data-fmt="xlsx"] .fmt-check { color: var(--se-excel); }
+.smart-export-popup .fmt-btn[data-fmt="csv"] .fmt-check { color: var(--se-csv); }
+.smart-export-popup .fmt-btn[data-fmt="txt"] .fmt-check { color: var(--se-txt); }
+
+.smart-export-popup .fmt-options { display: flex; gap: 10px; margin-bottom: 0; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .25s ease, opacity .2s ease, margin-bottom .25s ease; }
+.smart-export-popup .fmt-options.open { max-height: 60px; opacity: 1; margin-bottom: 10px; }
+.smart-export-popup .fmt-options .field { flex: 1; }
+.smart-export-popup .fmt-options label { display: block; font-size: 10.5px; font-weight: 600; color: var(--se-ink-faint); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.smart-export-popup .fmt-options select { padding: 6px 22px 6px 8px; }
+
+/* verify card */
+.smart-export-popup .verify-card { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--se-ink-soft); background: var(--se-surface-alt); border: 1px solid var(--se-border-soft); border-radius: 11px; padding: 11px 14px; margin-bottom: 12px; }
+.smart-export-popup .verify-card.ok { color: var(--se-success); font-weight: 600; background: var(--se-success-soft); border-color: transparent; }
+.smart-export-popup .verify-card.blocked { color: var(--se-danger); font-weight: 600; background: var(--se-danger-soft); border-color: transparent; }
+.smart-export-popup .verify-card .n { font-family: var(--se-font-mono); }
+.smart-export-popup .verify-card svg { width: 16px; height: 16px; flex: none; }
+
+/* footer */
+.smart-export-popup .se-modal-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 26px; border-top: 1px solid var(--se-border-soft); background: var(--se-surface); }
+.smart-export-popup .foot-hint { font-size: 12.5px; color: var(--se-ink-faint); display: flex; align-items: center; gap: 7px; min-height: 18px; }
+.smart-export-popup .foot-actions { display: flex; gap: 8px; flex: none; }
+.smart-export-popup .btn { font: 600 13px var(--se-font-body); border-radius: 9px; padding: 9px 16px; cursor: pointer; border: 1px solid transparent; transition: background .15s, color .15s, border-color .15s, opacity .15s; }
+.smart-export-popup .btn-secondary { background: var(--se-surface-alt); border-color: var(--se-border); color: var(--se-ink); }
+.smart-export-popup .btn-secondary:hover { border-color: var(--se-accent); color: var(--se-accent-ink); }
+.smart-export-popup .btn-primary { background: var(--se-accent); color: var(--se-accent-contrast); }
+.smart-export-popup .btn-primary:hover { background: var(--se-accent-strong); }
+.smart-export-popup .btn-primary:disabled { background: var(--se-surface-alt); color: var(--se-ink-faint); cursor: not-allowed; border-color: var(--se-border); }
+
+.smart-export-popup .spinner { width: 12px; height: 12px; flex: none; border-radius: 50%; border: 2px solid var(--se-border); border-top-color: var(--se-accent); animation: se-spin .7s linear infinite; }
+@keyframes se-spin { to { transform: rotate(360deg); } }
+
+/* trigger wrapper (the smart-export-loader controller's own div, outside the
+   modal — printed by templates/popup/trigger.html.twig), not the trigger <a>
+   itself: layout only, no color/spacing/decoration, lets it sit centered in a
+   themis action-column table cell alongside sibling action links/buttons. */
+.smart-export-trigger-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smart-export-popup .spinner { animation: none; }
+  .smart-export-popup * { transition-duration: .001s !important; }
+}

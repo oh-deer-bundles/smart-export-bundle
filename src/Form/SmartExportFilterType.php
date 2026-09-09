@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -113,9 +115,28 @@ class SmartExportFilterType extends AbstractType
             'interpreter' => null,
             'default_value' => null,
             'filter_widget' => FilterWidget::Auto,
+            // Whether the popup renders this filter's widget visibly. false means the
+            // column is filterable but SmartExportColumn::filterDisplay is off: the
+            // operator/value/value2 widgets built above still exist and still submit
+            // their (defaulted) value, the template just wraps them in a hidden
+            // container instead of a visible tile — see templates/popup/export_popup.html.twig.
+            'filter_display' => true,
             'choices' => [],
             'translation_domain' => 'smart_export_bundle_forms',
         ]);
+    }
+
+    /**
+     * Exposes filter_display/interpreter/filter_widget as view vars so the popup
+     * template can decide, per filter row, whether to render a visible tile or a
+     * hidden-but-still-submitting wrapper, and which of the 6 tile shapes to use —
+     * without needing any of this class's build-time-only options.
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        $view->vars['filter_display'] = $options['filter_display'];
+        $view->vars['interpreter'] = $options['interpreter'];
+        $view->vars['filter_widget'] = $options['filter_widget'];
     }
 
     private function valueType(?string $interpreter): string

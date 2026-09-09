@@ -1,0 +1,22 @@
+{% use 'form_div_layout.html.twig' %}
+
+{#
+    Form theme for the embeddable popup (templates/popup/export_popup.html.twig).
+    Unlike form/tailwind_layout.html.twig, this popup ships its own framework-free
+    CSS (public/css/popup.css) targeting bare element selectors (select, input,
+    .tri, .chipbox...) — so most widgets need no class injection at all. Only
+    FilterOptionBooleanType needs a dedicated block, for the same reason
+    tailwind_layout.html.twig already has one: the built-in choice_widget_expanded
+    never renders each radio's own <label> in this app's form theming stack, and
+    the .tri CSS needs each <input> immediately followed by its sibling <label>
+    (adjacent-sibling selector), not a <label> wrapping the <input>.
+#}
+{% block filter_option_boolean_widget %}
+    <div {{ block('widget_container_attributes') }} class="tri {{ attr.class|default('') }}" role="radiogroup">
+        {% for child in form %}
+            {{ form_widget(child) }}
+            {% set boolLabelKey = child.vars.value == '1' ? 'seb.filter.boolean.yes' : (child.vars.value == '0' ? 'seb.filter.boolean.no' : 'seb.filter.boolean.unfiltered') %}
+            <label for="{{ child.vars.id }}">{{ boolLabelKey|trans({}, 'smart_export_bundle_forms') }}</label>
+        {% endfor %}
+    </div>
+{% endblock %}

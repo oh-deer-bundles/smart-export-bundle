@@ -4,6 +4,7 @@
 namespace Odb\SmartExportBundle\DependencyInjection;
 
 
+use Odb\SmartExportBundle\Services\NullAllowedIdsVoter;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -41,8 +42,18 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('allowed_ids_cache_pool')
-                            ->info('Service id of the PSR-6 cache pool storing per-user allowed ids (see AllowedIdsResolver).')
+                            ->info('Service id of a cache pool storing per-user allowed ids (see AllowedIdsResolver) — must support the get-or-compute contract (Symfony\Contracts\Cache\CacheInterface), like the default cache.app.')
                             ->defaultValue('cache.app')
+                            ->cannotBeEmpty()
+                            ->end()
+                        ->integerNode('allowed_ids_ttl')
+                            ->info('Seconds a restricted entity\'s allowed-ids list stays cached (per user) before AllowedIdsResolver calls security.ids_voter again. Bundle-owned, on-demand refresh: there is no event to hook, this TTL is the only staleness guarantee.')
+                            ->defaultValue(600)
+                            ->min(1)
+                            ->end()
+                        ->scalarNode('ids_voter')
+                            ->info('Service id implementing Odb\SmartExportBundle\Services\AllowedIdsVoterInterface::getAllowedIds(string $className): array — called on demand by AllowedIdsResolver, never via an event. Defaults to a null voter granting no access to any restricted entity: REQUIRED to be overridden as soon as restricted_entities is non-empty.')
+                            ->defaultValue(NullAllowedIdsVoter::class)
                             ->cannotBeEmpty()
                             ->end()
                         ->arrayNode('restricted_entities')

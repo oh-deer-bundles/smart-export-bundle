@@ -27,7 +27,9 @@ class OdbSmartExportExtension extends Extension
 
         $container->setParameter('odb_smart_export.max_rows', $config['max_rows']);
         $container->setAlias('odb.smart-export.allowed_ids_cache', $config['security']['allowed_ids_cache_pool']);
+        $container->setAlias('odb.smart-export.ids_voter', $config['security']['ids_voter']);
         $container->setParameter('odb_smart_export.security.restricted_entities', $config['security']['restricted_entities']);
+        $container->setParameter('odb_smart_export.security.allowed_ids_ttl', $config['security']['allowed_ids_ttl']);
     }
 
 }
